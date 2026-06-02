@@ -108,3 +108,207 @@ a.button {
 div.breadcrumbs {
   font-weight: 500;
 }
+
+/* --- Layout breathing room ------------------------------------------------ */
+#content {
+  padding: 28px 40px;
+}
+#content > h1 {
+  font-size: 1.7rem;
+  margin-bottom: 4px;
+}
+
+/* --- Dashboard hero ------------------------------------------------------- */
+.bn-hero {
+  margin: 4px 0 22px;
+}
+.bn-hero h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 1.9rem;
+  margin: 0;
+}
+.bn-hero p {
+  margin: 4px 0 0;
+  color: var(--body-quiet-color, #8a8178);
+  font-size: 0.98rem;
+}
+
+/* --- Stat cards (theme-independent gradient) ------------------------------ */
+.bn-cards {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  margin: 0 0 30px;
+}
+.bn-card {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(140deg, #8a4b2f 0%, #5e3920 100%);
+  color: #fdf8f0;
+  border: 0;
+  border-radius: 18px;
+  padding: 22px 22px 20px;
+  box-shadow: 0 8px 22px rgba(60, 40, 20, 0.22);
+  transition: transform 0.14s ease, box-shadow 0.14s ease;
+}
+.bn-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 30px rgba(60, 40, 20, 0.3);
+}
+.bn-card .bn-ico {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  font-size: 1.5rem;
+  opacity: 0.55;
+}
+.bn-card b {
+  display: block;
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 2.6rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #ffffff;
+}
+.bn-card .bn-lbl {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: rgba(253, 248, 240, 0.82);
+}
+.bn-card.accent {
+  background: linear-gradient(140deg, #e0ab43 0%, #c2861d 100%);
+}
+.bn-card.accent b {
+  color: #3a2a05;
+}
+.bn-card.accent .bn-lbl {
+  color: rgba(58, 42, 5, 0.78);
+}
+
+/* --- Dashboard two-column grid -------------------------------------------- */
+.bn-dash-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 26px;
+  align-items: start;
+}
+@media (max-width: 1000px) {
+  .bn-dash-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.bn-dash-grid #content-main {
+  width: auto;
+}
+
+/* App-list modules: rounded cards with a branded header bar. */
+.bn-dash-grid .module,
+.bn-recent {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--hairline-color, #e7e0d3);
+  box-shadow: 0 4px 14px rgba(60, 40, 20, 0.08);
+  background: var(--body-bg, #fff);
+}
+.bn-dash-grid .module caption,
+.bn-dash-grid .module h2,
+.bn-recent-head {
+  background: linear-gradient(140deg, #8a4b2f, #5e3920);
+  color: #fdf8f0 !important;
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 1rem;
+  letter-spacing: 0.01em;
+  padding: 13px 18px;
+}
+.bn-dash-grid .module caption a {
+  color: #fdf8f0 !important;
+}
+.bn-dash-grid .module th,
+.bn-dash-grid .module td {
+  padding: 12px 18px;
+}
+.bn-dash-grid .module tr:hover td {
+  background: var(--selected-bg, #f7efe3);
+}
+
+/* --- Recent reviews panel ------------------------------------------------- */
+.bn-recent-head h2 {
+  margin: 0;
+  color: #fdf8f0;
+}
+.bn-recent ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.bn-recent li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--hairline-color, #ece5d7);
+}
+.bn-recent li:last-of-type {
+  border-bottom: 0;
+}
+.bn-avatar {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(140deg, #8a4b2f, #5e3920);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.bn-recent-body {
+  flex: 1;
+  min-width: 0;
+}
+.bn-recent-body a {
+  display: block;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bn-recent .bn-sub {
+  display: block;
+  color: var(--body-quiet-color, #8a8178);
+  font-size: 0.78rem;
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bn-chip {
+  flex: none;
+  background: #fbf0d2;
+  color: #5c4410;
+  border: 1px solid #ecd9a0;
+  border-radius: 999px;
+  padding: 2px 9px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.bn-links {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 18px;
+  border-top: 1px solid var(--hairline-color, #ece5d7);
+}
+.bn-links a {
+  font-weight: 600;
+}
+.bn-empty {
+  padding: 18px;
+  color: var(--body-quiet-color, #8a8178);
+}

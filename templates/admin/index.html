@@ -1,0 +1,51 @@
+{% extends "admin/base_site.html" %}
+{% load admin_extras i18n %}
+
+{% block content_title %}<h1>Catalogue management</h1>{% endblock %}
+
+{% block content %}
+{% get_admin_stats as stats %}
+
+<div class="bn-hero">
+  <h2>Welcome back 👋</h2>
+  <p>Here's how the BookNest community is doing today.</p>
+</div>
+
+<div class="bn-cards">
+  <div class="bn-card"><span class="bn-ico">📚</span><b>{{ stats.books }}</b><span class="bn-lbl">Books</span></div>
+  <div class="bn-card"><span class="bn-ico">✍️</span><b>{{ stats.reviews }}</b><span class="bn-lbl">Reviews</span></div>
+  <div class="bn-card"><span class="bn-ico">👥</span><b>{{ stats.members }}</b><span class="bn-lbl">Members</span></div>
+  <div class="bn-card"><span class="bn-ico">🏷️</span><b>{{ stats.genres }}</b><span class="bn-lbl">Genres</span></div>
+  <div class="bn-card accent"><span class="bn-ico">⭐</span><b>{{ stats.avg_rating }}</b><span class="bn-lbl">Avg rating</span></div>
+</div>
+
+<div class="bn-dash-grid">
+  <div id="content-main">
+    {% include "admin/app_list.html" with app_list=app_list show_changelinks=True %}
+  </div>
+
+  <aside class="bn-recent">
+    <div class="bn-recent-head"><h2>Recent reviews</h2></div>
+    {% if stats.recent %}
+      <ul>
+        {% for r in stats.recent %}
+          <li>
+            <span class="bn-avatar">{{ r.author.username|first|upper }}</span>
+            <span class="bn-recent-body">
+              <a href="{% url 'admin:catalog_review_change' r.pk %}">{{ r.headline }}</a>
+              <span class="bn-sub">{{ r.book.title }} · {{ r.author.username }}</span>
+            </span>
+            <span class="bn-chip">{{ r.rating }}★</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="bn-empty">No reviews yet.</p>
+    {% endif %}
+    <div class="bn-links">
+      <a href="{% url 'catalog:stats' %}">📊 Public insights →</a>
+      <a href="{% url 'catalog:book_list' %}">🌐 Live site →</a>
+    </div>
+  </aside>
+</div>
+{% endblock %}

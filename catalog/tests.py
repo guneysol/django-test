@@ -222,6 +222,26 @@ class APITests(TestCase):
         self.assertEqual(resp.json()["count"], 1)
 
 
+class AdminTests(TestCase):
+    def setUp(self):
+        self.admin = User.objects.create_superuser("root", "root@example.com", "pw12345!")
+        Book.objects.create(title="Dune", author="Herbert")
+
+    def test_custom_dashboard_renders(self):
+        self.client.login(username="root", password="pw12345!")
+        resp = self.client.get("/admin/")
+        self.assertEqual(resp.status_code, 200)
+        # Custom dashboard widgets and branding are present.
+        self.assertContains(resp, "Recent reviews")
+        self.assertContains(resp, "Catalogue management")
+
+    def test_book_changelist_renders(self):
+        self.client.login(username="root", password="pw12345!")
+        resp = self.client.get("/admin/catalog/book/")
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "Dune")
+
+
 class OpenLibraryIntegrationTests(TestCase):
     """Third-party API integration, tested with the network mocked out."""
 
