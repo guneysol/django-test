@@ -19,7 +19,7 @@
         <a href="{% url 'catalog:book_list' %}">Browse</a>
         <a href="{% url 'catalog:stats' %}">Insights</a>
         {% if user.is_authenticated %}
-          <a href="{% url 'catalog:book_create' %}">Add book</a>
+          {% if user.is_staff %}<a href="{% url 'catalog:book_create' %}">Add book</a>{% endif %}
           <a href="{% url 'accounts:profile_detail' user.username %}">My profile</a>
           <form action="{% url 'logout' %}" method="post" class="inline-form">
             {% csrf_token %}

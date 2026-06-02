@@ -16,6 +16,15 @@ class IsAuthorOrReadOnly(permissions.BasePermission):
         return owner == request.user or request.user.is_staff
 
 
+class IsStaffOrReadOnly(permissions.BasePermission):
+    """Allow read for anyone, but writes only for staff/administrators."""
+
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return bool(request.user and request.user.is_staff)
+
+
 class GenreViewSet(viewsets.ReadOnlyModelViewSet):
     """Read-only list of genres."""
 
@@ -28,7 +37,8 @@ class BookViewSet(viewsets.ModelViewSet):
 
     queryset = Book.objects.select_related("genre").all()
     serializer_class = BookSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
+    # Books are catalogue data: anyone can read, only staff can write.
+    permission_classes = [IsStaffOrReadOnly]
     lookup_field = "slug"
     search_fields = ["title", "author", "description"]
     ordering_fields = ["title", "published_year", "created_at"]

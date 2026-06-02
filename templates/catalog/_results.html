@@ -37,5 +37,5 @@ instant-search AJAX response, so the two can never drift apart.
 
   {% include "catalog/_pagination.html" %}
 {% else %}
-  <p class="empty">No books match your search. Try a different term{% if user.is_authenticated %} or <a href="{% url 'catalog:book_create' %}">add a book</a>{% endif %}.</p>
+  <p class="empty">No books match your search. Try a different term{% if user.is_staff %} or <a href="{% url 'catalog:book_create' %}">add a book</a>{% endif %}.</p>
 {% endif %}

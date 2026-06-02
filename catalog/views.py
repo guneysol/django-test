@@ -178,7 +178,10 @@ def book_detail(request, slug):
 
 @login_required
 def book_create(request):
-    """Add a new book to the catalog (any signed-in member)."""
+    """Add a new book to the catalog. Restricted to staff/administrators."""
+    if not request.user.is_staff:
+        messages.error(request, "Only administrators can add books to the catalog.")
+        return redirect("catalog:book_list")
     form = BookForm(request.POST or None, request.FILES or None)
     if request.method == "POST" and form.is_valid():
         book = form.save(commit=False)

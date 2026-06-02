@@ -45,7 +45,7 @@ class ModelTests(TestCase):
 
 class ViewTests(TestCase):
     def setUp(self):
-        self.owner = User.objects.create_user("owner", password="pw12345!")
+        self.owner = User.objects.create_user("owner", password="pw12345!", is_staff=True)
         self.other = User.objects.create_user("other", password="pw12345!")
         self.genre = Genre.objects.create(name="Fantasy")
         self.book = Book.objects.create(
@@ -95,8 +95,8 @@ class ViewTests(TestCase):
         self.assertEqual(resp.status_code, 302)
         self.assertIn("/accounts/login/", resp.url)
 
-    def test_authenticated_user_can_create_book(self):
-        self.client.login(username="owner", password="pw12345!")
+    def test_staff_can_create_book(self):
+        self.client.login(username="owner", password="pw12345!")  # owner is staff
         resp = self.client.post(
             reverse("catalog:book_create"),
             {"title": "Mistborn", "author": "Sanderson", "published_year": 2006},
@@ -104,6 +104,17 @@ class ViewTests(TestCase):
         self.assertEqual(resp.status_code, 302)
         book = Book.objects.get(title="Mistborn")
         self.assertEqual(book.added_by, self.owner)
+
+    def test_regular_user_cannot_create_book(self):
+        # A logged-in but non-staff member is blocked from adding books.
+        self.client.login(username="other", password="pw12345!")
+        resp = self.client.post(
+            reverse("catalog:book_create"),
+            {"title": "Sneaky", "author": "Nobody"},
+        )
+        self.assertEqual(resp.status_code, 302)
+        self.assertRedirects(resp, reverse("catalog:book_list"))
+        self.assertFalse(Book.objects.filter(title="Sneaky").exists())
 
     def test_non_owner_cannot_edit(self):
         self.client.login(username="other", password="pw12345!")
@@ -180,6 +191,9 @@ class ViewTests(TestCase):
 class APITests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user("apiuser", password="pw12345!")
+        self.staff = User.objects.create_user(
+            "apistaff", password="pw12345!", is_staff=True
+        )
         self.book = Book.objects.create(title="Dune", author="Herbert")
 
     def test_list_books_public(self):
@@ -191,11 +205,16 @@ class APITests(TestCase):
         resp = self.client.post("/api/books/", {"title": "X", "author": "Y"})
         self.assertIn(resp.status_code, (401, 403))
 
-    def test_authenticated_create_via_api(self):
+    def test_regular_user_cannot_create_book_via_api(self):
         self.client.login(username="apiuser", password="pw12345!")
+        resp = self.client.post("/api/books/", {"title": "Nope", "author": "X"})
+        self.assertEqual(resp.status_code, 403)
+
+    def test_staff_can_create_via_api(self):
+        self.client.login(username="apistaff", password="pw12345!")
         resp = self.client.post("/api/books/", {"title": "New", "author": "Auth"})
         self.assertEqual(resp.status_code, 201)
-        self.assertEqual(resp.json()["added_by"], "apiuser")
+        self.assertEqual(resp.json()["added_by"], "apistaff")
 
     def test_api_search(self):
         Book.objects.create(title="Neuromancer", author="Gibson")
