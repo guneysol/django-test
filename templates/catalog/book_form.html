@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}{% if creating %}Add a book{% else %}Edit book{% endif %} · BookNest{% endblock %}
+
+{% block content %}
+<div class="form-card wide">
+  <h1>{% if creating %}Add a book{% else %}Edit “{{ form.instance.title }}”{% endif %}</h1>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn btn-primary" type="submit">{% if creating %}Add book{% else %}Save changes{% endif %}</button>
+    <a class="btn" href="{% if creating %}{% url 'catalog:book_list' %}{% else %}{{ form.instance.get_absolute_url }}{% endif %}">Cancel</a>
+  </form>
+</div>
+{% endblock %}

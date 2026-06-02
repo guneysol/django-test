@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Edit profile · BookNest{% endblock %}
+
+{% block content %}
+<div class="form-card">
+  <h1>Edit your profile</h1>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn btn-primary" type="submit">Save</button>
+    <a class="btn" href="{% url 'accounts:profile_detail' user.username %}">Cancel</a>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Browse books · BookNest{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <h1>Discover your next read</h1>
+  <p class="muted">{{ page_obj.paginator.count }} book{{ page_obj.paginator.count|pluralize }} in the community catalog.</p>
+</div>
+
+<form class="toolbar" method="get" data-live-search>
+  <input type="search" name="q" value="{{ query }}" placeholder="Search title, author or description…" aria-label="Search books">
+  <select name="sort" aria-label="Sort by" onchange="this.form.submit()">
+    {% for key in sort_options %}
+      <option value="{{ key }}" {% if key == sort %}selected{% endif %}>{{ key|capfirst }}</option>
+    {% endfor %}
+  </select>
+  {% if active_genre %}<input type="hidden" name="genre" value="{{ active_genre.slug }}">{% endif %}
+  <button class="btn btn-primary" type="submit">Search</button>
+</form>
+
+<div class="genre-chips">
+  <a class="chip {% if not active_genre %}active{% endif %}" href="{% url 'catalog:book_list' %}{% if query %}?q={{ query }}{% endif %}">All genres</a>
+  {% for genre in genres %}
+    <a class="chip {% if active_genre == genre %}active{% endif %}"
+       href="?genre={{ genre.slug }}{% if query %}&q={{ query }}{% endif %}">
+      {{ genre.name }} ({{ genre.num_books }})
+    </a>
+  {% endfor %}
+</div>
+
+{% if page_obj %}
+  <div class="book-grid">
+    {% for book in page_obj %}
+      <article class="card">
+        <a class="card-cover" href="{{ book.get_absolute_url }}">
+          {% if book.cover %}<img src="{{ book.cover.url }}" alt="Cover of {{ book.title }}">{% else %}📖{% endif %}
+        </a>
+        <div class="card-body">
+          <h3><a href="{{ book.get_absolute_url }}">{{ book.title }}</a></h3>
+          <span class="card-meta">by {{ book.author }}{% if book.genre %} · {{ book.genre.name }}{% endif %}</span>
+          <span class="rating">
+            {% if book.avg_rating %}
+              ★ {{ book.avg_rating|floatformat:1 }} <span class="count">({{ book.num_reviews }})</span>
+            {% else %}
+              <span class="count">No reviews yet</span>
+            {% endif %}
+          </span>
+        </div>
+      </article>
+    {% endfor %}
+  </div>
+
+  {% include "catalog/_pagination.html" %}
+{% else %}
+  <p class="empty">No books match your search. Try a different term{% if user.is_authenticated %} or <a href="{% url 'catalog:book_create' %}">add a book</a>{% endif %}.</p>
+{% endif %}
+{% endblock %}

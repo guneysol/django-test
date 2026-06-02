@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}{{ profile_user.username }} · BookNest{% endblock %}
+
+{% block content %}
+<div class="profile-head">
+  {% if profile_user.profile.avatar %}
+    <img class="avatar" src="{{ profile_user.profile.avatar.url }}" alt="{{ profile_user.username }}">
+  {% else %}
+    <div class="avatar">{{ profile_user.username|first|upper }}</div>
+  {% endif %}
+  <div>
+    <h1>{{ profile_user.username }}</h1>
+    {% if profile_user.profile.location %}<p class="muted">📍 {{ profile_user.profile.location }}{% if profile_user.profile.favorite_genre %} · loves {{ profile_user.profile.favorite_genre }}{% endif %}</p>{% endif %}
+    {% if profile_user.profile.bio %}<p>{{ profile_user.profile.bio }}</p>{% endif %}
+    {% if user == profile_user %}<a class="btn btn-sm" href="{% url 'accounts:profile_edit' %}">Edit profile</a>{% endif %}
+  </div>
+</div>
+
+<section class="section">
+  <h2>Reading list ({{ reading_list.count }})</h2>
+  {% if reading_list %}
+    <div class="book-grid">
+      {% for book in reading_list %}
+        <article class="card">
+          <a class="card-cover" href="{{ book.get_absolute_url }}">
+            {% if book.cover %}<img src="{{ book.cover.url }}" alt="Cover of {{ book.title }}">{% else %}📖{% endif %}
+          </a>
+          <div class="card-body">
+            <h3><a href="{{ book.get_absolute_url }}">{{ book.title }}</a></h3>
+            <span class="card-meta">by {{ book.author }}</span>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="empty">No books shelved yet.</p>
+  {% endif %}
+</section>
+
+<section class="section">
+  <h2>Reviews ({{ reviews.count }})</h2>
+  {% for review in reviews %}
+    <article class="review">
+      <div class="review-head">
+        <h4><a href="{{ review.book.get_absolute_url }}">{{ review.headline }}</a></h4>
+        <span class="rating">{{ review.rating }}★</span>
+      </div>
+      <p class="review-meta">on <em>{{ review.book.title }}</em> · {{ review.created_at|date:"M j, Y" }}</p>
+      <p>{{ review.body|truncatewords:40 }}</p>
+    </article>
+  {% empty %}
+    <p class="empty">No reviews written yet.</p>
+  {% endfor %}
+</section>
+{% endblock %}

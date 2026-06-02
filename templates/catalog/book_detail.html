@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}{{ book.title }} · BookNest{% endblock %}
+
+{% block content %}
+<div class="detail">
+  <div class="detail-cover">
+    {% if book.cover %}<img src="{{ book.cover.url }}" alt="Cover of {{ book.title }}">{% else %}📖{% endif %}
+  </div>
+  <div>
+    <h1>{{ book.title }}</h1>
+    <p class="byline">by {{ book.author }}{% if book.published_year %} · {{ book.published_year }}{% endif %}</p>
+
+    <p>
+      {% if book.genre %}<a class="chip active" href="{{ book.genre.get_absolute_url }}">{{ book.genre.name }}</a>{% endif %}
+      <span class="rating">
+        {% if book.average_rating %}★ {{ book.average_rating }} <span class="count">({{ book.review_count }} review{{ book.review_count|pluralize }})</span>
+        {% else %}<span class="count">No reviews yet</span>{% endif %}
+      </span>
+    </p>
+
+    {% if book.description %}<p>{{ book.description|linebreaksbr }}</p>{% endif %}
+
+    <div class="detail-actions">
+      {% if user.is_authenticated %}
+        <button class="btn" type="button"
+                data-shelf-url="{% url 'catalog:toggle_shelf' book.slug %}"
+                aria-pressed="{{ is_shelved|yesno:'true,false' }}">
+          {% if is_shelved %}On your shelf{% else %}Add to reading list{% endif %}
+        </button>
+      {% else %}
+        <a class="btn" href="{% url 'login' %}?next={{ request.path }}">Log in to shelve</a>
+      {% endif %}
+      <span class="muted">📚 <span data-shelf-count>{{ book.shelved_by.count }}</span> shelved</span>
+
+      {% if user == book.added_by or user.is_staff %}
+        <a class="btn btn-sm" href="{% url 'catalog:book_edit' book.slug %}">Edit</a>
+        <form action="{% url 'catalog:book_delete' book.slug %}" method="post" class="inline-form"
+              onsubmit="return confirm('Delete this book and all its reviews?');">
+          {% csrf_token %}
+          <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+        </form>
+      {% endif %}
+    </div>
+    {% if book.added_by %}<p class="muted">Added by <a href="{% url 'accounts:profile_detail' book.added_by.username %}">{{ book.added_by.username }}</a></p>{% endif %}
+  </div>
+</div>
+
+<section class="section">
+  <h2>Reviews</h2>
+
+  {% if user.is_authenticated %}
+    <div class="form-card wide">
+      <h3>{% if user_review %}Update your review{% else %}Write a review{% endif %}</h3>
+      <form action="{% url 'catalog:review_submit' book.slug %}" method="post">
+        {% csrf_token %}
+        <p>
+          <label for="id_rating">Rating</label>
+          <select name="rating" id="id_rating" required>
+            {% for value, label in review_form.fields.rating.choices %}
+              {% if value %}<option value="{{ value }}" {% if user_review and user_review.rating == value %}selected{% endif %}>{{ label }}</option>{% endif %}
+            {% endfor %}
+          </select>
+        </p>
+        <p>
+          <label for="id_headline">Headline</label>
+          <input type="text" name="headline" id="id_headline" maxlength="120" required
+                 value="{{ user_review.headline|default:'' }}">
+        </p>
+        <p>
+          <label for="id_body">Your thoughts</label>
+          <textarea name="body" id="id_body" rows="5" required>{{ user_review.body|default:'' }}</textarea>
+        </p>
+        <button class="btn btn-primary" type="submit">{% if user_review %}Save changes{% else %}Post review{% endif %}</button>
+      </form>
+    </div>
+  {% else %}
+    <p class="muted"><a href="{% url 'login' %}?next={{ request.path }}">Log in</a> to leave a review.</p>
+  {% endif %}
+
+  {% for review in reviews %}
+    <article class="review">
+      <div class="review-head">
+        <h4>{{ review.headline }}</h4>
+        <span class="rating">{{ review.rating }}★</span>
+      </div>
+      <p class="review-meta">
+        by <a href="{% url 'accounts:profile_detail' review.author.username %}">{{ review.author.username }}</a>
+        · {{ review.created_at|date:"M j, Y" }}
+        {% if review.author == user or user.is_staff %}
+          · <form action="{% url 'catalog:review_delete' review.pk %}" method="post" class="inline-form"
+                  onsubmit="return confirm('Delete this review?');">
+              {% csrf_token %}
+              <button class="link-button" style="color:var(--danger)" type="submit">delete</button>
+            </form>
+        {% endif %}
+      </p>
+      <p>{{ review.body|linebreaksbr }}</p>
+    </article>
+  {% empty %}
+    <p class="empty">Be the first to review this book.</p>
+  {% endfor %}
+</section>
+{% endblock %}

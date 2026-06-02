@@ -1,0 +1,194 @@
+/* ---------------------------------------------------------------------------
+   BookNest stylesheet — a small, dependency-free, responsive design system.
+   Uses CSS custom properties, flexbox and CSS grid; mobile-first with one
+   breakpoint at 720px.
+--------------------------------------------------------------------------- */
+
+:root {
+  --bg: #f7f5f0;
+  --surface: #ffffff;
+  --ink: #2c2a26;
+  --muted: #6b675f;
+  --primary: #7b4b2a;
+  --primary-dark: #5e3920;
+  --accent: #c9a227;
+  --border: #e4dfd5;
+  --danger: #b3261e;
+  --success: #2e7d32;
+  --radius: 12px;
+  --shadow: 0 1px 3px rgba(0, 0, 0, .08), 0 6px 16px rgba(0, 0, 0, .05);
+  --maxw: 1080px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.55;
+}
+
+a { color: var(--primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.container { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 1rem; }
+
+/* --- Header / nav --------------------------------------------------------- */
+.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 10;
+}
+.nav { display: flex; align-items: center; justify-content: space-between; min-height: 64px; flex-wrap: wrap; }
+.brand { font-size: 1.35rem; font-weight: 700; color: var(--primary-dark); }
+.brand:hover { text-decoration: none; }
+.nav-links { display: flex; align-items: center; gap: 1.1rem; }
+.nav-links a { color: var(--ink); font-weight: 500; }
+.nav-toggle { display: none; background: none; border: 0; font-size: 1.5rem; cursor: pointer; }
+.inline-form { display: inline; margin: 0; }
+.link-button { background: none; border: 0; color: var(--ink); font: inherit; cursor: pointer; padding: 0; }
+.link-button:hover { color: var(--primary); }
+
+/* --- Buttons -------------------------------------------------------------- */
+.btn {
+  display: inline-block; border: 1px solid var(--border); background: var(--surface);
+  color: var(--ink); padding: .55rem 1rem; border-radius: 999px; cursor: pointer;
+  font: inherit; font-weight: 600; transition: all .15s ease; text-align: center;
+}
+.btn:hover { text-decoration: none; transform: translateY(-1px); box-shadow: var(--shadow); }
+.btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-danger { background: var(--surface); color: var(--danger); border-color: var(--danger); }
+.btn-danger:hover { background: var(--danger); color: #fff; }
+.btn-sm { padding: .35rem .8rem; font-size: .9rem; }
+.btn-block { display: block; width: 100%; }
+.btn[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #3a2c00; }
+
+/* --- Alerts --------------------------------------------------------------- */
+.messages { margin: 1rem 0; display: grid; gap: .5rem; }
+.alert { padding: .7rem 1rem; border-radius: var(--radius); border: 1px solid; }
+.alert-success { background: #eaf5ea; border-color: #bcdfbc; color: var(--success); }
+.alert-error, .alert-danger { background: #fdecea; border-color: #f5c6c2; color: var(--danger); }
+.alert-info, .alert-warning { background: #fff8e1; border-color: #f0e0a8; color: #7a5b00; }
+
+/* --- Hero / page heading -------------------------------------------------- */
+.page-head { margin: 1.5rem 0 1rem; }
+.page-head h1 { margin: 0 0 .25rem; font-size: 1.9rem; }
+.muted { color: var(--muted); }
+
+/* --- Search & filter bar -------------------------------------------------- */
+.toolbar {
+  display: flex; gap: .75rem; flex-wrap: wrap; align-items: center;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: .9rem; box-shadow: var(--shadow);
+}
+.toolbar input[type="search"], .toolbar select {
+  padding: .55rem .7rem; border: 1px solid var(--border); border-radius: 8px;
+  font: inherit; background: #fff; color: var(--ink);
+}
+.toolbar input[type="search"] { flex: 1 1 220px; }
+.genre-chips { display: flex; gap: .5rem; flex-wrap: wrap; margin: 1rem 0; }
+.chip {
+  padding: .3rem .8rem; border-radius: 999px; border: 1px solid var(--border);
+  background: var(--surface); font-size: .9rem; color: var(--muted);
+}
+.chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.chip:hover { text-decoration: none; }
+
+/* --- Book grid ------------------------------------------------------------ */
+.book-grid {
+  display: grid; gap: 1.2rem; margin: 1.5rem 0;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow);
+  display: flex; flex-direction: column; transition: transform .15s ease;
+}
+.card:hover { transform: translateY(-3px); }
+.card-cover {
+  aspect-ratio: 3 / 4; background: linear-gradient(135deg, #d8cbb4, #b89b6e);
+  display: flex; align-items: center; justify-content: center; color: #fff;
+  font-size: 2.5rem; overflow: hidden;
+}
+.card-cover img { width: 100%; height: 100%; object-fit: cover; }
+.card-body { padding: .85rem; display: flex; flex-direction: column; gap: .35rem; flex: 1; }
+.card-body h3 { margin: 0; font-size: 1.05rem; line-height: 1.3; }
+.card-body h3 a { color: var(--ink); }
+.card-meta { font-size: .85rem; color: var(--muted); }
+.rating { color: var(--accent); font-weight: 700; }
+.rating .count { color: var(--muted); font-weight: 400; }
+
+/* --- Pagination ----------------------------------------------------------- */
+.pagination { display: flex; gap: .4rem; justify-content: center; margin: 2rem 0; flex-wrap: wrap; }
+.pagination a, .pagination span {
+  padding: .45rem .8rem; border: 1px solid var(--border); border-radius: 8px;
+  background: var(--surface);
+}
+.pagination .current { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+/* --- Detail page ---------------------------------------------------------- */
+.detail { display: grid; grid-template-columns: 240px 1fr; gap: 2rem; margin: 1.5rem 0; }
+.detail-cover {
+  aspect-ratio: 3 / 4; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow);
+  background: linear-gradient(135deg, #d8cbb4, #b89b6e); display: flex;
+  align-items: center; justify-content: center; color: #fff; font-size: 4rem;
+}
+.detail-cover img { width: 100%; height: 100%; object-fit: cover; }
+.detail h1 { margin: 0 0 .25rem; }
+.detail .byline { font-size: 1.1rem; color: var(--muted); margin: 0 0 1rem; }
+.detail-actions { display: flex; gap: .6rem; flex-wrap: wrap; margin: 1rem 0; }
+
+.section { margin: 2rem 0; }
+.section h2 { border-bottom: 2px solid var(--border); padding-bottom: .4rem; }
+
+.review {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1rem; margin-bottom: 1rem; box-shadow: var(--shadow);
+}
+.review-head { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; flex-wrap: wrap; }
+.review-head h4 { margin: 0; }
+.review-meta { font-size: .85rem; color: var(--muted); }
+
+/* --- Forms ---------------------------------------------------------------- */
+.form-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.5rem; box-shadow: var(--shadow); max-width: 540px; margin: 1.5rem auto;
+}
+.form-card.wide { max-width: 720px; }
+form p { margin: 0 0 1rem; }
+form label { display: block; font-weight: 600; margin-bottom: .3rem; }
+form input:not([type="checkbox"]):not([type="submit"]), form select, form textarea {
+  width: 100%; padding: .55rem .7rem; border: 1px solid var(--border);
+  border-radius: 8px; font: inherit; background: #fff; color: var(--ink);
+}
+form .helptext { display: block; font-size: .8rem; color: var(--muted); margin-top: .25rem; }
+form ul.errorlist { margin: .25rem 0; padding-left: 1.1rem; color: var(--danger); font-size: .85rem; }
+
+/* --- Profile -------------------------------------------------------------- */
+.profile-head { display: flex; gap: 1.2rem; align-items: center; margin: 1.5rem 0; flex-wrap: wrap; }
+.avatar {
+  width: 88px; height: 88px; border-radius: 50%; object-fit: cover;
+  background: var(--primary); color: #fff; display: flex; align-items: center;
+  justify-content: center; font-size: 2rem; font-weight: 700;
+}
+
+.empty { text-align: center; color: var(--muted); padding: 2rem; }
+
+/* --- Footer --------------------------------------------------------------- */
+.site-footer { border-top: 1px solid var(--border); margin-top: 3rem; padding: 1.5rem 0; color: var(--muted); }
+.site-footer a { color: var(--muted); text-decoration: underline; }
+
+/* --- Responsive ----------------------------------------------------------- */
+@media (max-width: 720px) {
+  .nav-toggle { display: block; }
+  .nav-links {
+    display: none; flex-direction: column; align-items: flex-start;
+    width: 100%; gap: .75rem; padding: .75rem 0;
+  }
+  .nav-links.open { display: flex; }
+  .detail { grid-template-columns: 1fr; }
+  .detail-cover { max-width: 220px; margin: 0 auto; }
+}

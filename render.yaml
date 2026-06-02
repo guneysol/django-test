@@ -1,0 +1,26 @@
+# Render.com blueprint — one-click deploy of BookNest with a managed Postgres DB.
+# See https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: booknest
+    runtime: python
+    plan: free
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn booknest.wsgi:application"
+    envVars:
+      - key: DJANGO_DEBUG
+        value: "0"
+      - key: DJANGO_SECRET_KEY
+        generateValue: true        # Render generates a strong random key.
+      - key: DJANGO_ALLOWED_HOSTS
+        sync: false                # Set to your *.onrender.com host.
+      - key: PYTHON_VERSION
+        value: "3.12.4"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: booknest-db
+          property: connectionString
+
+databases:
+  - name: booknest-db
+    plan: free
