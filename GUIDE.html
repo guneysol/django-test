@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BookNest — How It Works (Learning Guide)</title>
+<style>
+  :root{
+    --bg:#f7f5f0; --surface:#fff; --ink:#2c2a26; --muted:#6b675f;
+    --primary:#7b4b2a; --primary-dark:#5e3920; --accent:#c9a227;
+    --border:#e4dfd5; --code-bg:#2b2622; --code-ink:#f3ede2; --ok:#2e7d32;
+    --radius:12px; --shadow:0 1px 3px rgba(0,0,0,.08),0 6px 16px rgba(0,0,0,.05);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink);background:var(--bg);line-height:1.65}
+  .wrap{max-width:920px;margin:0 auto;padding:0 1.2rem}
+  a{color:var(--primary)} a:hover{color:var(--primary-dark)}
+
+  header.hero{background:linear-gradient(135deg,#7b4b2a,#5e3920);color:#fff;padding:3rem 0 2.2rem}
+  header.hero h1{margin:0;font-size:2.4rem;letter-spacing:-.5px}
+  header.hero p{margin:.6rem 0 0;font-size:1.15rem;opacity:.92;max-width:680px}
+  .pill{display:inline-block;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);
+    padding:.25rem .7rem;border-radius:999px;font-size:.85rem;margin:.9rem .4rem 0 0}
+
+  nav.toc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:1rem 1.3rem;box-shadow:var(--shadow);margin:-1.6rem 0 2rem;position:relative}
+  nav.toc strong{display:block;margin-bottom:.4rem;color:var(--muted);text-transform:uppercase;
+    font-size:.75rem;letter-spacing:.08em}
+  nav.toc ol{margin:0;padding-left:1.2rem;columns:2;column-gap:2rem}
+  nav.toc li{margin:.2rem 0}
+
+  section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:1.6rem 1.8rem;margin:0 0 1.4rem;box-shadow:var(--shadow)}
+  section h2{margin:.1rem 0 1rem;font-size:1.5rem;border-bottom:3px solid var(--accent);
+    padding-bottom:.5rem;display:inline-block}
+  section h3{margin:1.4rem 0 .5rem;font-size:1.15rem;color:var(--primary-dark)}
+  .lead{font-size:1.05rem}
+
+  code{background:#efe9dd;padding:.12em .4em;border-radius:5px;font-size:.92em;
+    font-family:"SF Mono",Menlo,Consolas,monospace}
+  pre{background:var(--code-bg);color:var(--code-ink);padding:1rem 1.1rem;border-radius:10px;
+    overflow:auto;font-size:.88rem;line-height:1.55;
+    font-family:"SF Mono",Menlo,Consolas,monospace}
+  pre code{background:none;padding:0;color:inherit}
+
+  table{width:100%;border-collapse:collapse;margin:.6rem 0;font-size:.95rem}
+  th,td{text-align:left;padding:.55rem .6rem;border-bottom:1px solid var(--border);vertical-align:top}
+  th{background:#f0ebe0;font-size:.82rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+  tr:last-child td{border-bottom:none}
+
+  .grid{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+  .tile{border:1px solid var(--border);border-radius:10px;padding:1rem;background:#fbf9f4}
+  .tile h4{margin:0 0 .35rem;font-size:1rem}
+  .tile p{margin:0;font-size:.9rem;color:var(--muted)}
+
+  .badge{display:inline-block;background:#eaf5ea;color:var(--ok);border:1px solid #bcdfbc;
+    border-radius:999px;padding:.1rem .55rem;font-size:.78rem;font-weight:600}
+  .points{float:right;background:var(--primary);color:#fff;border-radius:999px;
+    padding:.15rem .7rem;font-size:.8rem;font-weight:700}
+
+  .callout{border-left:4px solid var(--accent);background:#fff8e1;padding:.8rem 1rem;
+    border-radius:0 8px 8px 0;margin:1rem 0}
+  .flow{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.82rem;white-space:pre;
+    background:#fbf9f4;border:1px dashed var(--border);border-radius:10px;padding:1rem;overflow:auto}
+
+  .filemap b{color:var(--primary-dark)}
+  footer{color:var(--muted);text-align:center;padding:2rem 0 3rem;font-size:.9rem}
+  .scorecard td:first-child{font-weight:600}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <h1>📚 BookNest</h1>
+    <p>A community book-review platform — and this page is your guided tour of <em>what it is</em>, <em>how it works under the hood</em>, and <em>exactly how it satisfies every line of your grading scheme</em>.</p>
+    <div>
+      <span class="pill">Django 6.0</span>
+      <span class="pill">Django REST Framework</span>
+      <span class="pill">SQLite / PostgreSQL</span>
+      <span class="pill">29 passing tests</span>
+      <span class="pill">7 advanced features</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<nav class="toc">
+  <strong>On this page</strong>
+  <ol>
+    <li><a href="#what">What the app is</a></li>
+    <li><a href="#bigpicture">The big picture (how a request flows)</a></li>
+    <li><a href="#files">Where everything lives</a></li>
+    <li><a href="#models">The data model</a></li>
+    <li><a href="#features">Feature walkthrough</a></li>
+    <li><a href="#api">The REST API</a></li>
+    <li><a href="#run">How to run &amp; test it</a></li>
+    <li><a href="#scheme">How it maps to the grading scheme</a></li>
+    <li><a href="#glossary">Mini Django glossary</a></li>
+  </ol>
+</nav>
+
+<!-- 1 -->
+<section id="what">
+  <h2>1 · What the app is</h2>
+  <p class="lead">BookNest is a website where a community of readers can keep a shared catalogue of books and talk about them.</p>
+  <p>Think of it as a tiny Goodreads. A logged-in member can:</p>
+  <div class="grid">
+    <div class="tile"><h4>📖 Add &amp; manage books</h4><p>Create a book with a title, author, genre, cover image, year and description — then edit or delete the ones they added.</p></div>
+    <div class="tile"><h4>⭐ Review &amp; rate</h4><p>Give any book a 1–5 star rating plus a written review. One review per person per book; posting again updates it.</p></div>
+    <div class="tile"><h4>🔖 Build a reading list</h4><p>“Shelve” books they want to read. The button updates instantly without reloading the page (AJAX).</p></div>
+    <div class="tile"><h4>🔍 Search &amp; browse</h4><p>Search by title/author, filter by genre, and sort by rating, popularity or newest — with pagination.</p></div>
+    <div class="tile"><h4>👤 Profiles</h4><p>Each member gets a public profile page listing their reviews and shelved books.</p></div>
+    <div class="tile"><h4>🔌 An API</h4><p>The same data is available as a JSON REST API for programs, not just the browser.</p></div>
+  </div>
+  <div class="callout"><strong>The theme is just a vehicle.</strong> The point of the project is to demonstrate the Django skills your rubric asks for — models, views, templates, forms, auth, an API, and so on. “Books &amp; reviews” is simply a domain rich enough to show all of them naturally.</div>
+</section>
+
+<!-- 2 -->
+<section id="bigpicture">
+  <h2>2 · The big picture — how a request flows</h2>
+  <p>Django uses the <strong>MVT</strong> pattern: <strong>M</strong>odel (data) → <strong>V</strong>iew (logic) → <strong>T</strong>emplate (HTML). Here’s what happens when you click a book:</p>
+  <div class="flow">Browser  ──GET /books/dune-frank-herbert/──▶  booknest/urls.py
+                                              │  (matches the catalog routes)
+                                              ▼
+                                       catalog/urls.py
+                                              │  routes to the right view
+                                              ▼
+                                    catalog/views.py  →  book_detail()
+                                              │  asks the database via the ORM…
+                                              ▼
+                              catalog/models.py  (Book, Review)  ◀──▶  Database
+                                              │  …gets the book + its reviews
+                                              ▼
+                       templates/catalog/book_detail.html   (fills in the HTML)
+                                              │
+                                              ▼
+Browser  ◀──────────  finished HTML page  ──────────────────────────────┘</div>
+  <p>Every page on the site follows that same path. The REST API follows an almost identical one, except the last step produces <strong>JSON</strong> instead of HTML (via a <em>serializer</em> rather than a template).</p>
+</section>
+
+<!-- 3 -->
+<section id="files">
+  <h2>3 · Where everything lives</h2>
+  <p>The project is split into two focused “apps” (<code>accounts</code> and <code>catalog</code>) plus the project package (<code>booknest</code>). That separation keeps identity/login concerns apart from the book domain.</p>
+  <pre class="filemap"><code>booknest/            <b>The project</b> — global config
+  settings.py        all configuration (database, apps, security, API)
+  urls.py            the master URL map (wires up everything)
+
+accounts/            <b>App 1 — people</b>
+  models.py          Profile (extra info attached to each User)
+  signals.py         auto-creates a Profile whenever a User is made
+  forms.py           SignUpForm, ProfileForm
+  views.py           signup, profile page, edit profile
+  urls.py            /accounts/... routes
+
+catalog/             <b>App 2 — books</b>
+  models.py          Genre, Book, Review  (the heart of the app)
+  views.py           browse, detail, create/edit/delete, review, AJAX shelf
+  forms.py           BookForm, ReviewForm
+  api.py             REST API viewsets (DRF)
+  serializers.py     turn models into JSON for the API
+  services.py        talks to the Open Library third-party API
+  admin.py           configures the built-in admin site
+  urls.py            / and /books/... routes
+  management/commands/
+    seed_data.py        fills the DB with demo data
+    import_openlibrary.py  imports real books from the internet
+  tests.py           the automated test suite
+
+templates/           <b>The HTML</b> (what the user sees)
+  base.html          shared layout (header, nav, footer)
+  catalog/ , accounts/ , registration/   page templates
+
+static/              <b>CSS &amp; JavaScript</b> (no build step needed)
+  css/styles.css     the whole responsive design
+  js/app.js          mobile menu, AJAX shelving, live search</code></pre>
+</section>
+
+<!-- 4 -->
+<section id="models">
+  <h2>4 · The data model (the most important part)</h2>
+  <p>Everything revolves around four tables. Here’s how they relate:</p>
+  <div class="flow">   User ◀──1:1──▶ Profile            (each account has one profile)
+    │
+    │ added_by (who created it)
+    ▼
+  Book ──ForeignKey──▶ Genre          (each book has one genre; a genre has many books)
+    │  ▲
+    │  └── shelved_by  ◀── Many-to-Many ──▶  User   (reading lists)
+    │
+    │ 1 book has many…
+    ▼
+  Review  ── belongs to one Book AND one User
+          ── UNIQUE(book, author): one review per person per book</div>
+
+  <h3>Why these relationship types?</h3>
+  <table>
+    <tr><th>Relationship</th><th>Type</th><th>Why</th></tr>
+    <tr><td>User ↔ Profile</td><td>One-to-One</td><td>Add fields (bio, avatar) to a user without replacing Django’s built-in User.</td></tr>
+    <tr><td>Book → Genre</td><td>ForeignKey (many-to-one)</td><td>A book is in one genre; a genre groups many books.</td></tr>
+    <tr><td>Book → User (added_by)</td><td>ForeignKey</td><td>Tracks the owner so only they (or staff) can edit/delete it.</td></tr>
+    <tr><td>Book ↔ User (shelved_by)</td><td>Many-to-Many</td><td>A reading list: many users shelve many books.</td></tr>
+    <tr><td>Review → Book &amp; User</td><td>Two ForeignKeys</td><td>A review links one book to one author.</td></tr>
+  </table>
+
+  <div class="callout"><strong>Data integrity is enforced by the database, not just code.</strong> The rule “one review per member per book” is a real <code>UniqueConstraint</code>, ratings are validated to 1–5, and slugs (the URL-friendly names like <code>dune-frank-herbert</code>) are guaranteed unique. A test deliberately triggers an <code>IntegrityError</code> to prove the constraint works.</div>
+
+  <h3>A peek at the code</h3>
+  <pre><code># catalog/models.py  (simplified)
+class Review(models.Model):
+    book   = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="reviews")
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reviews")
+    rating = models.PositiveSmallIntegerField(           # 1..5, validated
+                 validators=[MinValueValidator(1), MaxValueValidator(5)])
+    headline = models.CharField(max_length=120)
+    body     = models.TextField()
+
+    class Meta:
+        constraints = [                                  # DB-level rule
+            models.UniqueConstraint(fields=["book", "author"],
+                                    name="unique_review_per_user_book")
+        ]</code></pre>
+</section>
+
+<!-- 5 -->
+<section id="features">
+  <h2>5 · Feature walkthrough</h2>
+
+  <h3>CRUD — Create, Read, Update, Delete</h3>
+  <p>Books and reviews can both be fully managed. The view checks ownership before any change:</p>
+  <pre><code># Only the contributor or a staff member may edit a book
+if book.added_by != request.user and not request.user.is_staff:
+    messages.error(request, "You don't have permission to edit this book.")
+    return redirect(book)</code></pre>
+
+  <h3>Authentication &amp; Authorization</h3>
+  <p><strong>Authentication</strong> = “who are you?” (signup / login / logout, powered by Django’s auth system). <strong>Authorization</strong> = “what are you allowed to do?” (the ownership check above, and <code>@login_required</code> on every page that changes data).</p>
+
+  <h3>Search, filter, sort &amp; pagination</h3>
+  <p>The browse page reads the URL’s query string (<code>?q=dune&amp;genre=fantasy&amp;sort=rating&amp;page=2</code>) and builds one efficient database query. Average rating and review count are calculated in that <em>same</em> query (an “annotation”), so sorting by rating doesn’t cause extra lookups.</p>
+  <pre><code>books = Book.objects.select_related("genre").annotate(
+    avg_rating=Avg("reviews__rating"),       # computed in SQL, reused for sort + display
+    num_reviews=Count("reviews"),
+)
+paginator = Paginator(books, 6)              # 6 books per page</code></pre>
+
+  <h3>AJAX — the instant “Add to reading list” button</h3>
+  <p>When you click shelve, JavaScript sends a background request and updates just the button — no page reload. If JavaScript is off, the same button still works via a normal form submit. That’s called <em>progressive enhancement</em>.</p>
+  <pre><code># The view detects an AJAX call and returns JSON instead of a redirect
+if request.headers.get("x-requested-with") == "XMLHttpRequest":
+    return JsonResponse({"shelved": shelved, "count": book.shelved_by.count(), ...})</code></pre>
+
+  <h3>Third-party API integration (Open Library)</h3>
+  <p>A command can pull real book data off the internet from the free Open Library API:</p>
+  <pre><code>python manage.py import_openlibrary "ursula k le guin" --limit 3 --dry-run</code></pre>
+</section>
+
+<!-- 6 -->
+<section id="api">
+  <h2>6 · The REST API</h2>
+  <p>Built with Django REST Framework. Visit <code>/api/</code> in the browser for a clickable interface. Reads are public; writing requires logging in, and you can only change your own records.</p>
+  <table>
+    <tr><th>Method</th><th>Endpoint</th><th>Does</th></tr>
+    <tr><td>GET</td><td><code>/api/books/</code></td><td>List books — supports <code>?search=</code>, <code>?ordering=</code>, <code>?page=</code></td></tr>
+    <tr><td>POST</td><td><code>/api/books/</code></td><td>Create a book (login required)</td></tr>
+    <tr><td>GET/PUT/DELETE</td><td><code>/api/books/{slug}/</code></td><td>Read / update / delete one book (owner only)</td></tr>
+    <tr><td>GET/POST</td><td><code>/api/reviews/</code></td><td>List / create reviews</td></tr>
+    <tr><td>GET</td><td><code>/api/genres/</code></td><td>List genres (read-only)</td></tr>
+  </table>
+  <p>Try it from a terminal:</p>
+  <pre><code>curl "http://127.0.0.1:8000/api/books/?search=dune&amp;ordering=-published_year"</code></pre>
+</section>
+
+<!-- 7 -->
+<section id="run">
+  <h2>7 · How to run &amp; test it</h2>
+  <h3>Run the site</h3>
+  <pre><code>source venv/bin/activate          # activate the virtual environment
+python manage.py runserver        # start the dev server
+# → open http://127.0.0.1:8000/</code></pre>
+  <p><strong>Demo login:</strong> username <code>ada</code> · password <code>booknest123</code> (also <code>grace</code>, <code>linus</code>, <code>margaret</code>).</p>
+
+  <h3>Run the automated tests</h3>
+  <pre><code>python manage.py test     # → Ran 29 tests … OK</code></pre>
+
+  <h3>Reset the demo data anytime</h3>
+  <pre><code>python manage.py seed_data --flush</code></pre>
+
+  <div class="callout">If you ever start fresh on another machine: <code>pip install -r requirements.txt</code> → <code>python manage.py migrate</code> → <code>python manage.py seed_data</code> → <code>runserver</code>.</div>
+</section>
+
+<!-- 8 -->
+<section id="scheme">
+  <h2>8 · How it maps to your grading scheme</h2>
+  <p>Every category in the brief, and where BookNest delivers it:</p>
+
+  <table class="scorecard">
+    <tr><th>Rubric category</th><th>How BookNest satisfies it</th></tr>
+    <tr><td>1 · Core functionality <span class="points">25</span></td>
+        <td>Full CRUD for books &amp; reviews; correct Django models/views/templates/URLs/forms; validation on ratings, year, duplicate emails &amp; reviews; friendly error handling (no crashes).</td></tr>
+    <tr><td>2 · Database design <span class="points">15</span></td>
+        <td>FK, M2M and 1-to-1 relationships; clean migrations; a DB-level unique constraint and field validators; efficient queries using <code>select_related</code> + annotations (no N+1).</td></tr>
+    <tr><td>3 · Frontend &amp; UX <span class="points">15</span></td>
+        <td>Custom responsive stylesheet (mobile/tablet/desktop), card grid, sticky nav with a mobile hamburger menu, intuitive flows, flash messages.</td></tr>
+    <tr><td>4 · Advanced features <span class="points">15</span></td>
+        <td><span class="badge">7 features</span> authentication, authorization, search/filter, pagination, REST API, AJAX, and third-party API — far beyond the “3+” bar.</td></tr>
+    <tr><td>5 · Code quality <span class="points">10</span></td>
+        <td>Two cohesive apps, consistent naming, docstrings on modules/models/views, a reusable pagination partial and a service layer for the external API.</td></tr>
+    <tr><td>6 · Documentation <span class="points">10</span></td>
+        <td><code>README.md</code> (description, setup, features) + <code>DOCUMENTATION.md</code> (models, architecture, design choices) + this guide.</td></tr>
+    <tr><td>7 · Testing &amp; debugging <span class="points">5</span></td>
+        <td>29 automated tests across models, views, permissions, API and the integration; written to also document expected behaviour.</td></tr>
+    <tr><td>8 · Deployment <span class="points">5</span></td>
+        <td>Render blueprint (<code>render.yaml</code>), <code>build.sh</code>, <code>Procfile</code>, WhiteNoise static serving, and environment-aware production security (passes <code>check --deploy</code>).</td></tr>
+    <tr><td>Bonus <span class="points">+5</span></td>
+        <td>Live third-party data import, progressive-enhancement AJAX, query-optimised browsing, and a polished UI.</td></tr>
+  </table>
+</section>
+
+<!-- 9 -->
+<section id="glossary">
+  <h2>9 · Mini Django glossary</h2>
+  <table>
+    <tr><th>Term</th><th>Plain-English meaning</th></tr>
+    <tr><td><strong>Model</strong></td><td>A Python class that describes a database table (e.g. <code>Book</code>).</td></tr>
+    <tr><td><strong>Migration</strong></td><td>An auto-generated file that tells the database how to build/change those tables.</td></tr>
+    <tr><td><strong>ORM</strong></td><td>“Object-Relational Mapper” — lets you query the DB with Python (<code>Book.objects.filter(...)</code>) instead of raw SQL.</td></tr>
+    <tr><td><strong>View</strong></td><td>A function that handles a request and decides what to send back.</td></tr>
+    <tr><td><strong>Template</strong></td><td>An HTML file with placeholders Django fills in with data.</td></tr>
+    <tr><td><strong>Form</strong></td><td>Validates and cleans user input before it touches the database.</td></tr>
+    <tr><td><strong>URLconf</strong></td><td>The map from a web address to the view that handles it.</td></tr>
+    <tr><td><strong>Serializer</strong></td><td>The API’s version of a template — turns a model into JSON and back.</td></tr>
+    <tr><td><strong>Slug</strong></td><td>A URL-safe name, e.g. <code>the-hobbit-tolkien</code>.</td></tr>
+    <tr><td><strong>Signal</strong></td><td>A hook that runs code when something happens (we use one to auto-create a Profile).</td></tr>
+    <tr><td><strong>AJAX</strong></td><td>JavaScript talking to the server in the background so the page updates without reloading.</td></tr>
+  </table>
+</section>
+
+<footer>
+  BookNest — Django term project · open <code>README.md</code> and <code>DOCUMENTATION.md</code> for the written versions of this guide.
+</footer>
+
+</div>
+</body>
+</html>
