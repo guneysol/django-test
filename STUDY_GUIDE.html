@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BookNest — Presentation Study Guide</title>
+<style>
+  :root{
+    --bg:#f6f2ea; --surface:#fff; --ink:#2a2722; --muted:#79736a;
+    --primary:#8a4b2f; --primary-dark:#693620; --accent:#d8a33a; --accent-ink:#5c4410;
+    --border:#e7e0d3; --code-bg:#2b2622; --code-ink:#f3ede2; --ok:#2e7d32; --q:#693620;
+    --radius:14px; --shadow:0 4px 10px rgba(60,40,20,.07),0 12px 28px rgba(60,40,20,.07);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink);background:var(--bg);line-height:1.65}
+  .wrap{max-width:940px;margin:0 auto;padding:0 1.2rem}
+  h1,h2,h3,h4{font-family:"Fraunces","Iowan Old Style",Georgia,serif}
+  a{color:var(--primary)}
+
+  header.hero{background:linear-gradient(135deg,#8a4b2f,#54290f);color:#fff;padding:3rem 0 2.4rem}
+  header.hero h1{margin:0;font-size:2.4rem}
+  header.hero p{margin:.6rem 0 0;font-size:1.15rem;opacity:.93;max-width:680px}
+  .pill{display:inline-block;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);
+    padding:.25rem .7rem;border-radius:999px;font-size:.85rem;margin:.9rem .4rem 0 0}
+
+  nav.toc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:1rem 1.3rem;box-shadow:var(--shadow);margin:-1.6rem 0 2rem}
+  nav.toc strong{display:block;margin-bottom:.4rem;color:var(--muted);text-transform:uppercase;font-size:.75rem;letter-spacing:.08em}
+  nav.toc ol{margin:0;padding-left:1.2rem;columns:2;column-gap:2rem}
+  nav.toc li{margin:.2rem 0}
+
+  section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:1.6rem 1.8rem;margin:0 0 1.4rem;box-shadow:var(--shadow)}
+  section h2{margin:.1rem 0 1rem;font-size:1.5rem;border-bottom:3px solid var(--accent);padding-bottom:.5rem;display:inline-block}
+  .lead{font-size:1.06rem}
+
+  /* Q&A blocks */
+  .qa{border:1px solid var(--border);border-radius:12px;margin:.9rem 0;overflow:hidden}
+  .qa .q{background:#f7efe3;padding:.8rem 1rem;font-weight:600;color:var(--q);display:flex;gap:.55rem;align-items:flex-start}
+  .qa .q::before{content:"Q";background:var(--primary);color:#fff;border-radius:6px;width:1.4rem;height:1.4rem;
+    display:inline-flex;align-items:center;justify-content:center;font-size:.8rem;flex:none;margin-top:.05rem}
+  .qa .a{padding:.85rem 1rem .95rem}
+  .qa .a p{margin:.2rem 0 .6rem}
+  .qa .a p:last-child{margin-bottom:0}
+  .tag{display:inline-block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+    color:var(--accent-ink);background:#fbf0d2;border:1px solid #ecd9a0;border-radius:999px;padding:.05rem .5rem;margin-left:.4rem}
+  .deep{font-size:.92rem;color:var(--muted);border-left:3px solid var(--border);padding-left:.7rem;margin-top:.5rem}
+  .deep b{color:var(--ink)}
+
+  code{background:#efe9dd;padding:.12em .4em;border-radius:5px;font-size:.9em;font-family:"SF Mono",Menlo,Consolas,monospace}
+  pre{background:var(--code-bg);color:var(--code-ink);padding:.95rem 1.05rem;border-radius:10px;overflow:auto;
+    font-size:.85rem;line-height:1.55;font-family:"SF Mono",Menlo,Consolas,monospace}
+  pre code{background:none;padding:0;color:inherit}
+
+  table{width:100%;border-collapse:collapse;margin:.6rem 0;font-size:.93rem}
+  th,td{text-align:left;padding:.5rem .6rem;border-bottom:1px solid var(--border);vertical-align:top}
+  th{background:#f0ebe0;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+  tr:last-child td{border-bottom:none}
+  td code{white-space:nowrap}
+
+  .callout{border-left:4px solid var(--accent);background:#fff8e1;padding:.85rem 1rem;border-radius:0 8px 8px 0;margin:1rem 0}
+  .callout.green{border-color:var(--ok);background:#ecf6ec}
+  .flow{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.8rem;white-space:pre;
+    background:#fbf9f4;border:1px dashed var(--border);border-radius:10px;padding:1rem;overflow:auto}
+  .key{background:#f7efe3;border-radius:8px;padding:.5rem .8rem;display:inline-block;font-weight:600;margin:.2rem 0}
+  ol.steps{padding-left:1.2rem} ol.steps li{margin:.35rem 0}
+  footer{color:var(--muted);text-align:center;padding:2rem 0 3rem;font-size:.9rem}
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+  @media(max-width:680px){.twocol{grid-template-columns:1fr}nav.toc ol{columns:1}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <h1>🎤 BookNest — Presentation Study Guide</h1>
+    <p>Everything you need to confidently answer the technical questions: where the database is, where data is stored, how it all fits together, and crisp answers to the questions a reviewer is most likely to ask.</p>
+    <div>
+      <span class="pill">Django 6.0</span>
+      <span class="pill">SQLite database</span>
+      <span class="pill">DB = db.sqlite3</span>
+      <span class="pill">29 tests passing</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<nav class="toc">
+  <strong>Jump to</strong>
+  <ol>
+    <li><a href="#pitch">30-second pitch</a></li>
+    <li><a href="#facts">Quick-fact cheat sheet</a></li>
+    <li><a href="#db">⭐ Where is the database?</a></li>
+    <li><a href="#stored">⭐ Where &amp; how is data stored?</a></li>
+    <li><a href="#flow">How data flows (request lifecycle)</a></li>
+    <li><a href="#qa-db">Q&amp;A — Database</a></li>
+    <li><a href="#qa-models">Q&amp;A — Models &amp; relationships</a></li>
+    <li><a href="#qa-sec">Q&amp;A — Auth &amp; security</a></li>
+    <li><a href="#qa-feat">Q&amp;A — Features &amp; logic</a></li>
+    <li><a href="#qa-api">Q&amp;A — REST API</a></li>
+    <li><a href="#qa-deploy">Q&amp;A — Deployment &amp; testing</a></li>
+    <li><a href="#prove">“Prove it” live commands</a></li>
+    <li><a href="#demo">Suggested demo script</a></li>
+    <li><a href="#tricky">Tricky / gotcha questions</a></li>
+  </ol>
+</nav>
+
+<!-- PITCH -->
+<section id="pitch">
+  <h2>30-second pitch</h2>
+  <p class="lead">“BookNest is a community book-review platform built with Django. Members sign up, add books, write star-rated reviews, and curate a reading list. It has full CRUD, authentication and permissions, search/filter, pagination, a REST API, AJAX, and a third-party integration with the Open Library API for real cover art. Data lives in a relational database through Django’s ORM, the UI is server-rendered with a custom responsive design, and it’s deployable to Render with one blueprint.”</p>
+  <div class="callout">Say this first if they ask “tell me about your project.” It name-drops every rubric category in one breath.</div>
+</section>
+
+<!-- FACTS -->
+<section id="facts">
+  <h2>Quick-fact cheat sheet</h2>
+  <table>
+    <tr><th>Question</th><th>One-line answer</th></tr>
+    <tr><td>Framework</td><td>Django <b>6.0</b> (Python web framework, MVT pattern)</td></tr>
+    <tr><td>Language</td><td>Python 3.12+</td></tr>
+    <tr><td>Database (dev)</td><td><b>SQLite</b> — a single file, <code>db.sqlite3</code>, in the project root</td></tr>
+    <tr><td>Database (prod)</td><td><b>PostgreSQL</b> — switched on automatically if <code>DATABASE_URL</code> is set</td></tr>
+    <tr><td>How code talks to the DB</td><td>Django’s <b>ORM</b> — Python objects, never hand-written SQL</td></tr>
+    <tr><td>API</td><td>Django REST Framework at <code>/api/</code></td></tr>
+    <tr><td>Front end</td><td>Server-rendered Django templates + custom CSS + vanilla JS</td></tr>
+    <tr><td>Auth</td><td>Django’s built-in auth (sessions + hashed passwords)</td></tr>
+    <tr><td>Apps</td><td>Two: <code>accounts</code> (people) and <code>catalog</code> (books)</td></tr>
+    <tr><td>Tests</td><td>29, run with <code>python manage.py test</code></td></tr>
+    <tr><td>Deploy target</td><td>Render.com (blueprint + Gunicorn + WhiteNoise)</td></tr>
+  </table>
+</section>
+
+<!-- DATABASE -->
+<section id="db">
+  <h2>⭐ Where is the database?</h2>
+  <p class="lead">It’s a <strong>SQLite</strong> database — a single self-contained file named <code>db.sqlite3</code> sitting in the project’s root folder.</p>
+  <p class="key">📁 /Users/guneyuzel/code/other/django-proj/db.sqlite3 &nbsp;(~216 KB)</p>
+
+  <h3>Why SQLite?</h3>
+  <p>SQLite is the database Django uses by default. It needs no separate server to install or run — the whole database is just that one file. That makes it perfect for development and demos.</p>
+
+  <h3>Where is that configured?</h3>
+  <p>In <code>booknest/settings.py</code>, the <code>DATABASES</code> setting:</p>
+  <pre><code>DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",      # ← the file, in the project root
+    }
+}</code></pre>
+  <div class="callout"><b>Smart answer if they push on “is SQLite production-ready?”:</b> “For a class project, yes — but the settings are environment-aware. If a <code>DATABASE_URL</code> environment variable is present (which it is on Render), the app automatically switches to <b>PostgreSQL</b> with zero code changes. So the same codebase runs SQLite locally and Postgres in production.”</p></div>
+</section>
+
+<!-- DATA STORED -->
+<section id="stored">
+  <h2>⭐ Where &amp; how is the data stored?</h2>
+  <p class="lead">All data lives in <strong>tables inside that <code>db.sqlite3</code> file</strong>. Each table was created automatically from a <em>model</em> (a Python class) via <em>migrations</em>. Here are the actual tables and their current row counts:</p>
+
+  <table>
+    <tr><th>Table</th><th>What it stores</th><th>Rows now</th></tr>
+    <tr><td><code>auth_user</code></td><td>User accounts (username, email, <b>hashed</b> password)</td><td>5</td></tr>
+    <tr><td><code>accounts_profile</code></td><td>Each user’s profile (bio, location, avatar)</td><td>5</td></tr>
+    <tr><td><code>catalog_genre</code></td><td>Genres (Fantasy, Mystery, …)</td><td>6</td></tr>
+    <tr><td><code>catalog_book</code></td><td>Books (title, author, year, cover URL, …)</td><td>14</td></tr>
+    <tr><td><code>catalog_review</code></td><td>Reviews (rating, headline, body + links to book &amp; user)</td><td>28</td></tr>
+    <tr><td><code>catalog_book_shelved_by</code></td><td><b>Join table</b> for the many-to-many “reading list” (which user shelved which book)</td><td>0</td></tr>
+    <tr><td><code>django_session</code></td><td>Login sessions (how the site remembers you’re logged in)</td><td>2</td></tr>
+    <tr><td><code>django_migrations</code></td><td>Record of which migrations have been applied</td><td>21</td></tr>
+    <tr><td><code>auth_permission</code>, <code>django_content_type</code>, …</td><td>Django’s built-in bookkeeping tables</td><td>—</td></tr>
+  </table>
+
+  <h3>The chain: Model → Migration → Table</h3>
+  <div class="flow">  catalog/models.py            catalog/migrations/0001…       db.sqlite3
+  ┌──────────────┐  makemigrations  ┌──────────────┐  migrate  ┌──────────────┐
+  │ class Book   │ ───────────────▶ │ instructions │ ────────▶ │ catalog_book │
+  │  title = …   │                  │ to build the │           │  table with  │
+  │  author = …  │                  │ table        │           │  columns     │
+  └──────────────┘                  └──────────────┘           └──────────────┘</div>
+  <ol class="steps">
+    <li>You describe data as a <b>model</b> (Python class) in <code>models.py</code>.</li>
+    <li><code>python manage.py makemigrations</code> turns that into a <b>migration</b> file (the “blueprint” for the table).</li>
+    <li><code>python manage.py migrate</code> runs the migration, which <b>creates/updates the real table</b> in <code>db.sqlite3</code>.</li>
+    <li>From then on, the <b>ORM</b> reads/writes rows in that table when you call things like <code>Book.objects.all()</code>.</li>
+  </ol>
+
+  <h3>What about uploaded images &amp; static files?</h3>
+  <table>
+    <tr><th>Kind of file</th><th>Where it lives</th></tr>
+    <tr><td>Uploaded cover images / avatars</td><td>The <code>media/</code> folder (path set by <code>MEDIA_ROOT</code>). The database only stores the <b>file path</b>, not the image bytes.</td></tr>
+    <tr><td>Open Library cover art</td><td>Not stored at all — the DB keeps the <b>URL</b> (<code>cover_url</code>) and the browser loads the image straight from Open Library.</td></tr>
+    <tr><td>CSS / JS</td><td>The <code>static/</code> folder in development; collected into <code>staticfiles/</code> for production.</td></tr>
+  </table>
+</section>
+
+<!-- FLOW -->
+<section id="flow">
+  <h2>How data flows (request lifecycle)</h2>
+  <p>If they ask “what happens when I open a book page?”, walk this line:</p>
+  <div class="flow">Browser ─GET /books/dune-frank-herbert/─▶ urls.py ─▶ catalog/views.py: book_detail()
+                                                                │
+                              Book.objects.get(slug=…)  ◀──ORM──┤ (reads the DB)
+                                       │                        │
+                                  db.sqlite3                    ▼
+                                       └──────row──────▶ template book_detail.html
+                                                                │
+Browser ◀──────────────────── finished HTML ───────────────────┘</div>
+  <p>The <b>API</b> path is identical except the final step runs a <b>serializer</b> that outputs JSON instead of a template that outputs HTML.</p>
+</section>
+
+<!-- QA DB -->
+<section id="qa-db">
+  <h2>Q&amp;A — Database</h2>
+
+  <div class="qa"><div class="q">Where is the database located?</div><div class="a">
+    <p><b>It’s a single SQLite file, <code>db.sqlite3</code>, in the project root.</b> SQLite is serverless — the database <em>is</em> that file.</p>
+    <p class="deep"><b>If they dig deeper:</b> it’s configured in <code>settings.py</code> under <code>DATABASES["default"]</code>, and switches to PostgreSQL automatically when a <code>DATABASE_URL</code> env var is present (production).</p>
+  </div></div>
+
+  <div class="qa"><div class="q">How does your Python code talk to the database? Do you write SQL?</div><div class="a">
+    <p><b>Through Django’s ORM (Object-Relational Mapper) — I almost never write raw SQL.</b> I write Python like <code>Book.objects.filter(genre=g)</code> and Django generates the SQL for me. This is safer (prevents SQL injection) and database-agnostic (works on SQLite and Postgres alike).</p>
+  </div></div>
+
+  <div class="qa"><div class="q">How did the tables get created?</div><div class="a">
+    <p><b>Via migrations.</b> I define models in <code>models.py</code>, run <code>makemigrations</code> to generate migration files, and <code>migrate</code> to apply them — which builds the actual tables. 21 migrations are currently applied.</p>
+  </div></div>
+
+  <div class="qa"><div class="q">How do you handle a many-to-many relationship in the DB?</div><div class="a">
+    <p><b>With a join table.</b> The reading list (users ↔ books) is a <code>ManyToManyField</code>. Django creates a hidden link table — <code>catalog_book_shelved_by</code> — where each row pairs one user id with one book id.</p>
+  </div></div>
+
+  <div class="qa"><div class="q">How do you keep the data consistent / prevent duplicates?</div><div class="a">
+    <p><b>Database-level constraints, not just app code.</b> A <code>UniqueConstraint(book, author)</code> guarantees one review per person per book; rating is validated 1–5; slugs are forced unique. There’s even a test that expects an <code>IntegrityError</code> to prove the constraint is real.</p>
+  </div></div>
+
+  <div class="qa"><div class="q">Isn’t querying slow / inefficient?</div><div class="a">
+    <p><b>I optimised the read paths.</b> I use <code>select_related</code> to avoid the N+1 query problem, and compute average rating &amp; review count with a single annotated query (<code>Avg</code>/<code>Count</code>) reused for both display and sorting. Title and author columns are indexed for fast search.</p>
+  </div></div>
+</section>
+
+<!-- QA MODELS -->
+<section id="qa-models">
+  <h2>Q&amp;A — Models &amp; relationships</h2>
+
+  <div class="qa"><div class="q">What are your main models and how do they relate?</div><div class="a">
+    <p><b>Four:</b> <code>Genre</code>, <code>Book</code>, <code>Review</code>, and a <code>Profile</code> on top of Django’s <code>User</code>.</p>
+    <table>
+      <tr><th>Relationship</th><th>Type</th></tr>
+      <tr><td>User ↔ Profile</td><td>One-to-One</td></tr>
+      <tr><td>Book → Genre</td><td>ForeignKey (many books, one genre)</td></tr>
+      <tr><td>Book → User (added_by)</td><td>ForeignKey (the contributor)</td></tr>
+      <tr><td>Book ↔ User (reading list)</td><td>Many-to-Many</td></tr>
+      <tr><td>Review → Book &amp; Review → User</td><td>Two ForeignKeys</td></tr>
+    </table>
+  </div></div>
+
+  <div class="qa"><div class="q">Why did you make a separate Profile model instead of changing the User?</div><div class="a">
+    <p><b>To extend the user without replacing Django’s battle-tested auth User.</b> A one-to-one <code>Profile</code> holds extra fields (bio, avatar, location). A signal auto-creates the profile whenever a user is created, so it always exists.</p>
+  </div></div>
+
+  <div class="qa"><div class="q">What is a slug and why use it?</div><div class="a">
+    <p><b>A URL-friendly version of the title</b>, e.g. <code>dune-frank-herbert</code>. It makes clean, readable URLs instead of <code>/books/7/</code>. I generate it automatically and guarantee it’s unique.</p>
+  </div></div>
+
+  <div class="qa"><div class="q">What happens to reviews if a book is deleted?</div><div class="a">
+    <p><b>They’re deleted too</b> — the Review→Book link uses <code>on_delete=CASCADE</code>. But deleting a <em>genre</em> uses <code>SET_NULL</code>, so books survive and just lose their genre.</p>
+  </div></div>
+</section>
+
+<!-- QA SECURITY -->
+<section id="qa-sec">
+  <h2>Q&amp;A — Authentication &amp; security</h2>
+
+  <div class="qa"><div class="q">Are passwords stored in plain text?</div><div class="a">
+    <p><b>No — never.</b> Django hashes them with <b>PBKDF2-SHA256</b> (1,200,000 iterations) plus a per-user salt. The DB stores something like <code>pbkdf2_sha256$1200000$…</code>, which can’t be reversed back into the password.</p>
+  </div></div>
+
+  <div class="qa"><div class="q">What’s the difference between authentication and authorization here?</div><div class="a">
+    <p><b>Authentication = “who are you?”</b> (signup/login/logout via Django sessions). <b>Authorization = “what can you do?”</b> — e.g. <code>@login_required</code> on pages that change data, and an ownership check so only a book’s contributor (or staff) can edit/delete it. The same rules are enforced in the REST API via a custom <code>IsAuthorOrReadOnly</code> permission.</p>
+  </div></div>
+
+  <div class="qa"><div class="q">How do you protect forms from CSRF attacks?</div><div class="a">
+    <p><b>Django’s CSRF protection</b> is on by default — every form includes a <code>{% csrf_token %}</code> and Django rejects POSTs without a valid token. My AJAX call sends the token in the <code>X-CSRFToken</code> header.</p>
+  </div></div>
+
+  <div class="qa"><div class="q">How does the site remember I’m logged in?</div><div class="a">
+    <p><b>Session cookies.</b> On login, Django creates a row in <code>django_session</code> and gives the browser a session-id cookie. Each request looks that id up to identify the user. In production, cookies are marked Secure + HttpOnly.</p>
+  </div></div>
+</section>
+
+<!-- QA FEATURES -->
+<section id="qa-feat">
+  <h2>Q&amp;A — Features &amp; logic</h2>
+
+  <div class="qa"><div class="q">How does search and filtering work?</div><div class="a">
+    <p><b>It reads the URL query string</b> (<code>?q=dune&amp;genre=fantasy&amp;sort=rating</code>) and builds one ORM query: a <code>Q</code>-object search across title/author/description, a genre filter, and a whitelisted sort. Then it’s paginated 6 per page.</p>
+  </div></div>
+
+  <div class="qa"><div class="q">What is AJAX and where do you use it?</div><div class="a">
+    <p><b>AJAX = JavaScript talking to the server in the background</b> so the page updates without a full reload. The “Add to reading list” button posts in the background and updates just the button + counter. The view detects the AJAX header and returns <b>JSON</b>; if JavaScript is off, the same button still works via a normal form submit (progressive enhancement).</p>
+  </div></div>
+
+  <div class="qa"><div class="q">How does pagination work?</div><div class="a">
+    <p><b>Django’s <code>Paginator</code></b> slices the queryset into pages of 6, and the page links preserve the current search/filter/sort so you don’t lose your place.</p>
+  </div></div>
+
+  <div class="qa"><div class="q">Tell me about the third-party API integration.</div><div class="a">
+    <p><b>I integrate the Open Library API.</b> A management command (<code>import_openlibrary</code>) fetches real book data, and book covers are pulled live from Open Library’s Covers API by ISBN. The network code is isolated in <code>services.py</code> and is mocked in tests so the suite stays fast and offline-safe.</p>
+  </div></div>
+
+  <div class="qa"><div class="q">How does the Insights / charts dashboard work?</div><div class="a">
+    <p><b>The server runs aggregation queries, the browser draws the charts.</b> Each dataset (rating distribution, books per genre, average rating per genre, reviews-over-time, top books) is one ORM query using <code>Count</code>/<code>Avg</code>/<code>TruncMonth</code> — no Python counting loops. The view passes the numbers to the template as JSON (<code>json_script</code>), and <b>Chart.js</b> renders them client-side. So the charts are always live, never hard-coded.</p>
+  </div></div>
+
+  <div class="qa"><div class="q">Where does the demo data come from?</div><div class="a">
+    <p><b>A custom management command: <code>python manage.py seed_data</code>.</b> It creates genres, 14 books, demo users and 28 reviews. <code>--flush</code> resets it. It’s idempotent (safe to re-run).</p>
+  </div></div>
+</section>
+
+<!-- QA API -->
+<section id="qa-api">
+  <h2>Q&amp;A — REST API</h2>
+
+  <div class="qa"><div class="q">What is the REST API and how is it built?</div><div class="a">
+    <p><b>A JSON interface to the same data, built with Django REST Framework</b> at <code>/api/</code>. ViewSets + a router expose <code>/api/books/</code>, <code>/api/reviews/</code>, <code>/api/genres/</code>. <b>Serializers</b> convert models ↔ JSON (the API’s equivalent of templates).</p>
+  </div></div>
+
+  <div class="qa"><div class="q">Who can use the API? Is it secured?</div><div class="a">
+    <p><b>Reads are public; writes require login</b> (<code>IsAuthenticatedOrReadOnly</code>), and you can only modify your own records (object-level <code>IsAuthorOrReadOnly</code>). Ownership is stamped from the logged-in user, so a client can’t spoof it.</p>
+  </div></div>
+
+  <div class="qa"><div class="q">Can you show it?</div><div class="a">
+    <p>Open <code>/api/</code> in the browser for the clickable interface, or run:</p>
+    <pre><code>curl "http://127.0.0.1:8000/api/books/?search=dune&amp;ordering=-published_year"</code></pre>
+  </div></div>
+</section>
+
+<!-- QA DEPLOY -->
+<section id="qa-deploy">
+  <h2>Q&amp;A — Deployment &amp; testing</h2>
+
+  <div class="qa"><div class="q">How would you deploy this?</div><div class="a">
+    <p><b>To Render.com using the included <code>render.yaml</code> blueprint.</b> It provisions a web service + a free PostgreSQL DB, runs <code>build.sh</code> (install → collectstatic → migrate), serves with <b>Gunicorn</b>, and serves static files via <b>WhiteNoise</b>. Security hardening (HTTPS redirect, HSTS, secure cookies) turns on automatically when <code>DEBUG=0</code>.</p>
+  </div></div>
+
+  <div class="qa"><div class="q">What’s the difference between dev and production settings?</div><div class="a">
+    <p><b>The settings are environment-driven.</b> Locally: SQLite, <code>DEBUG=1</code>, a dev secret key. In production: <code>DEBUG=0</code>, a real secret key, Postgres via <code>DATABASE_URL</code>, and all the security flags. Same code, different env vars. <code>python manage.py check --deploy</code> passes with zero issues.</p>
+  </div></div>
+
+  <div class="qa"><div class="q">How did you test it?</div><div class="a">
+    <p><b>29 automated tests</b> covering models, the unique-review constraint, every view, permission boundaries (a non-owner’s edit is rejected), search/filter/pagination, the AJAX endpoint, the REST API, signup/login/logout, and the Open Library integration (mocked). Run with <code>python manage.py test</code>. I also manually verified every flow in the browser.</p>
+  </div></div>
+</section>
+
+<!-- PROVE IT -->
+<section id="prove">
+  <h2>“Prove it” — live commands you can run on the spot</h2>
+  <p>If a reviewer wants evidence, these are safe to run in the terminal during the demo:</p>
+  <pre><code># 1. Show the database file exists and its size
+ls -lh db.sqlite3
+
+# 2. List every table inside the database
+python manage.py dbshell
+sqlite&gt; .tables
+sqlite&gt; .schema catalog_book      # show the Book table's columns
+sqlite&gt; SELECT title, author FROM catalog_book LIMIT 5;
+sqlite&gt; .quit
+
+# 3. Query data through the ORM (proves the Python ↔ DB link)
+python manage.py shell
+&gt;&gt;&gt; from catalog.models import Book, Review
+&gt;&gt;&gt; Book.objects.count()
+&gt;&gt;&gt; Book.objects.first().average_rating
+
+# 4. Prove passwords are hashed, not plain text
+python manage.py shell
+&gt;&gt;&gt; from django.contrib.auth.models import User
+&gt;&gt;&gt; User.objects.first().password      # → 'pbkdf2_sha256$1200000$...'
+
+# 5. Run the whole test suite
+python manage.py test</code></pre>
+  <div class="callout green"><b>Confidence line:</b> “The database is a SQLite file called <code>db.sqlite3</code>. I can open it right now and show you the tables, or query it through the ORM — whichever you prefer.”</div>
+</section>
+
+<!-- DEMO -->
+<section id="demo">
+  <h2>Suggested live demo script (≈3 min)</h2>
+  <ol class="steps">
+    <li><b>Home page</b> — point out the hero stats, the book grid with real covers, and the gold star ratings.</li>
+    <li><b>Search “dune” + pick a genre chip</b> — show search, filtering, and that the result count updates.</li>
+    <li><b>Sort by “Rating”</b> — show sorting; mention it’s one optimised DB query.</li>
+    <li><b>Open “Insights”</b> — show the charts dashboard; “every chart is a live aggregation query against the database.”</li>
+    <li><b>Open a book</b> — show the detail page, reviews, and average rating.</li>
+    <li><b>Click “Add to reading list”</b> — the button flips instantly with no reload → “that’s AJAX.”</li>
+    <li><b>Post a review</b> — show CRUD + that re-posting <em>updates</em> (the unique constraint).</li>
+    <li><b>Log out, try to edit someone’s book</b> — blocked → “that’s authorization.”</li>
+    <li><b>Visit <code>/api/books/</code></b> — show the JSON REST API.</li>
+    <li><b>Visit <code>/admin/</code></b> — show the data in Django’s admin (a view straight into the tables).</li>
+  </ol>
+  <div class="callout">Logins: <span class="key">ada / booknest123</span> &nbsp; admin: <span class="key">admin / admin12345</span></div>
+</section>
+
+<!-- TRICKY -->
+<section id="tricky">
+  <h2>Tricky / gotcha questions (with safe answers)</h2>
+
+  <div class="qa"><div class="q">“SQLite isn’t a real database, is it?”</div><div class="a">
+    <p>It absolutely is — it’s a fully relational SQL database, the most widely deployed database in the world (every phone uses it). For multi-user production traffic I’d use PostgreSQL, which my settings already support via <code>DATABASE_URL</code>. For a project demo, SQLite is the right, zero-setup choice.</p>
+  </div></div>
+
+  <div class="qa"><div class="q">“What happens if the Open Library API is down?”</div><div class="a">
+    <p>The site is unaffected. Covers are loaded by the browser, and if one fails an <code>onerror</code> handler shows a book-emoji placeholder. The import command wraps failures in a clear error and the tests mock the network, so nothing depends on it being up.</p>
+  </div></div>
+
+  <div class="qa"><div class="q">“How is this MVC?”</div><div class="a">
+    <p>Django calls it <b>MVT</b>: <b>Model</b> (data/ORM), <b>View</b> (the logic — equivalent to a controller), <b>Template</b> (the HTML). The framework itself plays the “controller” role of routing requests to views.</p>
+  </div></div>
+
+  <div class="qa"><div class="q">“Why two apps instead of one?”</div><div class="a">
+    <p>Separation of concerns. <code>accounts</code> handles identity (profiles, signup); <code>catalog</code> handles the book domain. Each stays cohesive and could be reused independently — that’s the Django “app” philosophy.</p>
+  </div></div>
+
+  <div class="qa"><div class="q">“Where’s the business logic — in the templates?”</div><div class="a">
+    <p>No. Templates only display data. Logic lives in <b>views</b> (request handling, permissions) and <b>models</b> (data rules, computed properties like <code>average_rating</code>), with external calls isolated in <code>services.py</code>. Templates stay “dumb.”</p>
+  </div></div>
+
+  <div class="qa"><div class="q">“If you had more time, what would you add?”</div><div class="a">
+    <p>Good honest answer: review comments/likes, full-text search (Postgres), user following, email verification on signup, and caching for the book list. Shows you understand the next steps.</p>
+  </div></div>
+</section>
+
+<footer>
+  BookNest study guide · pair with <code>GUIDE.html</code> (how it works) and <code>DOCUMENTATION.md</code> (architecture). Good luck! 🍀
+</footer>
+
+</div>
+</body>
+</html>

@@ -1,37 +1,43 @@
 {% extends "base.html" %}
+{% load catalog_extras %}
 
 {% block title %}{{ book.title }} · BookNest{% endblock %}
 
 {% block content %}
 <div class="detail">
   <div class="detail-cover">
-    {% if book.cover %}<img src="{{ book.cover.url }}" alt="Cover of {{ book.title }}">{% else %}📖{% endif %}
+    <span class="cover-emoji">📖</span>
+    {% if book.cover_image_url %}<img src="{{ book.cover_image_url }}" alt="Cover of {{ book.title }}" onerror="this.remove()">{% endif %}
   </div>
   <div>
     <h1>{{ book.title }}</h1>
     <p class="byline">by {{ book.author }}{% if book.published_year %} · {{ book.published_year }}{% endif %}</p>
 
-    <p>
-      {% if book.genre %}<a class="chip active" href="{{ book.genre.get_absolute_url }}">{{ book.genre.name }}</a>{% endif %}
-      <span class="rating">
-        {% if book.average_rating %}★ {{ book.average_rating }} <span class="count">({{ book.review_count }} review{{ book.review_count|pluralize }})</span>
-        {% else %}<span class="count">No reviews yet</span>{% endif %}
-      </span>
-    </p>
+    <div class="detail-rating">
+      {% if book.average_rating %}
+        {{ book.average_rating|stars }}
+        <span class="score">{{ book.average_rating }}</span>
+        <span class="muted">({{ book.review_count }} review{{ book.review_count|pluralize }})</span>
+      {% else %}
+        <span class="stars stars--empty" aria-hidden="true">★★★★★</span>
+        <span class="muted">No reviews yet</span>
+      {% endif %}
+      {% if book.genre %}· <a class="chip active" href="{{ book.genre.get_absolute_url }}">{{ book.genre.name }}</a>{% endif %}
+    </div>
 
-    {% if book.description %}<p>{{ book.description|linebreaksbr }}</p>{% endif %}
+    {% if book.description %}<p class="detail-desc">{{ book.description|linebreaksbr }}</p>{% endif %}
 
     <div class="detail-actions">
       {% if user.is_authenticated %}
         <button class="btn" type="button"
                 data-shelf-url="{% url 'catalog:toggle_shelf' book.slug %}"
                 aria-pressed="{{ is_shelved|yesno:'true,false' }}">
-          {% if is_shelved %}On your shelf{% else %}Add to reading list{% endif %}
+          {% if is_shelved %}✓ On your shelf{% else %}＋ Add to reading list{% endif %}
         </button>
       {% else %}
         <a class="btn" href="{% url 'login' %}?next={{ request.path }}">Log in to shelve</a>
       {% endif %}
-      <span class="muted">📚 <span data-shelf-count>{{ book.shelved_by.count }}</span> shelved</span>
+      <span class="shelf-meta">📚 <span data-shelf-count>{{ book.shelved_by.count }}</span> shelved</span>
 
       {% if user == book.added_by or user.is_staff %}
         <a class="btn btn-sm" href="{% url 'catalog:book_edit' book.slug %}">Edit</a>
@@ -45,6 +51,16 @@
     {% if book.added_by %}<p class="muted">Added by <a href="{% url 'accounts:profile_detail' book.added_by.username %}">{{ book.added_by.username }}</a></p>{% endif %}
   </div>
 </div>
+
+<section class="ai-card" data-ai-url="{% url 'catalog:ai_summary' book.slug %}">
+  <div class="ai-head">
+    <h3>✨ AI Insight</h3>
+    <span class="ai-tag">auto-generated</span>
+  </div>
+  <p class="ai-intro">Get an instant, AI-generated summary of what reviewers are saying about this book.</p>
+  <button class="btn btn-primary btn-sm" type="button" data-ai-btn>Summarise the reviews</button>
+  <p class="ai-output" data-ai-output hidden></p>
+</section>
 
 <section class="section">
   <h2>Reviews</h2>
@@ -82,10 +98,11 @@
     <article class="review">
       <div class="review-head">
         <h4>{{ review.headline }}</h4>
-        <span class="rating">{{ review.rating }}★</span>
+        {{ review.rating|stars }}
       </div>
-      <p class="review-meta">
-        by <a href="{% url 'accounts:profile_detail' review.author.username %}">{{ review.author.username }}</a>
+      <div class="review-byline">
+        <span class="ava">{{ review.author.username|first|upper }}</span>
+        <a href="{% url 'accounts:profile_detail' review.author.username %}">{{ review.author.username }}</a>
         · {{ review.created_at|date:"M j, Y" }}
         {% if review.author == user or user.is_staff %}
           · <form action="{% url 'catalog:review_delete' review.pk %}" method="post" class="inline-form"
@@ -94,7 +111,7 @@
               <button class="link-button" style="color:var(--danger)" type="submit">delete</button>
             </form>
         {% endif %}
-      </p>
+      </div>
       <p>{{ review.body|linebreaksbr }}</p>
     </article>
   {% empty %}

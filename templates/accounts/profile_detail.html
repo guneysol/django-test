@@ -23,8 +23,9 @@
     <div class="book-grid">
       {% for book in reading_list %}
         <article class="card">
-          <a class="card-cover" href="{{ book.get_absolute_url }}">
-            {% if book.cover %}<img src="{{ book.cover.url }}" alt="Cover of {{ book.title }}">{% else %}📖{% endif %}
+          <a class="cover" href="{{ book.get_absolute_url }}" aria-label="{{ book.title }}">
+            <span class="cover-emoji">📖</span>
+            {% if book.cover_image_url %}<img src="{{ book.cover_image_url }}" alt="Cover of {{ book.title }}" loading="lazy" onerror="this.remove()">{% endif %}
           </a>
           <div class="card-body">
             <h3><a href="{{ book.get_absolute_url }}">{{ book.title }}</a></h3>

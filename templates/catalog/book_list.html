@@ -1,18 +1,27 @@
 {% extends "base.html" %}
+{% load catalog_extras %}
 
 {% block title %}Browse books · BookNest{% endblock %}
 
 {% block content %}
-<div class="page-head">
+<section class="hero">
   <h1>Discover your next read</h1>
-  <p class="muted">{{ page_obj.paginator.count }} book{{ page_obj.paginator.count|pluralize }} in the community catalog.</p>
-</div>
+  <p>Explore the community catalogue, share your reviews, and build a reading list you'll actually finish.</p>
+  <div class="hero-stats">
+    <div class="stat"><b>{{ total_books }}</b><span>Books</span></div>
+    <div class="stat"><b>{{ total_reviews }}</b><span>Reviews</span></div>
+    <div class="stat"><b>{{ total_genres }}</b><span>Genres</span></div>
+  </div>
+</section>
 
-<form class="toolbar" method="get" data-live-search>
-  <input type="search" name="q" value="{{ query }}" placeholder="Search title, author or description…" aria-label="Search books">
-  <select name="sort" aria-label="Sort by" onchange="this.form.submit()">
+<form class="toolbar" method="get" data-live-search data-results-url="{% url 'catalog:book_list' %}">
+  <div class="search-wrap">
+    <input type="search" name="q" value="{{ query }}" placeholder="Search title, author or description…" aria-label="Search books" autocomplete="off">
+    <span class="search-spinner" data-search-spinner aria-hidden="true"></span>
+  </div>
+  <select name="sort" aria-label="Sort by">
     {% for key in sort_options %}
-      <option value="{{ key }}" {% if key == sort %}selected{% endif %}>{{ key|capfirst }}</option>
+      <option value="{{ key }}" {% if key == sort %}selected{% endif %}>Sort: {{ key|capfirst }}</option>
     {% endfor %}
   </select>
   {% if active_genre %}<input type="hidden" name="genre" value="{{ active_genre.slug }}">{% endif %}
@@ -29,30 +38,7 @@
   {% endfor %}
 </div>
 
-{% if page_obj %}
-  <div class="book-grid">
-    {% for book in page_obj %}
-      <article class="card">
-        <a class="card-cover" href="{{ book.get_absolute_url }}">
-          {% if book.cover %}<img src="{{ book.cover.url }}" alt="Cover of {{ book.title }}">{% else %}📖{% endif %}
-        </a>
-        <div class="card-body">
-          <h3><a href="{{ book.get_absolute_url }}">{{ book.title }}</a></h3>
-          <span class="card-meta">by {{ book.author }}{% if book.genre %} · {{ book.genre.name }}{% endif %}</span>
-          <span class="rating">
-            {% if book.avg_rating %}
-              ★ {{ book.avg_rating|floatformat:1 }} <span class="count">({{ book.num_reviews }})</span>
-            {% else %}
-              <span class="count">No reviews yet</span>
-            {% endif %}
-          </span>
-        </div>
-      </article>
-    {% endfor %}
-  </div>
-
-  {% include "catalog/_pagination.html" %}
-{% else %}
-  <p class="empty">No books match your search. Try a different term{% if user.is_authenticated %} or <a href="{% url 'catalog:book_create' %}">add a book</a>{% endif %}.</p>
-{% endif %}
+<div id="results" data-results>
+  {% include "catalog/_results.html" %}
+</div>
 {% endblock %}

@@ -4,12 +4,14 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Avg, Count, Q
+from django.db.models.functions import TruncMonth
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
 from .forms import BookForm, ReviewForm
 from .models import Book, Genre, Review
+from .services import generate_ai_summary
 
 # Whitelist of sort options to keep the ordering ORM-safe.
 SORT_OPTIONS = {
@@ -57,8 +59,97 @@ def book_list(request):
         "active_genre": active_genre,
         "sort": sort,
         "sort_options": SORT_OPTIONS,
+        # Headline stats for the hero banner.
+        "total_books": Book.objects.count(),
+        "total_reviews": Review.objects.count(),
+        "total_genres": Genre.objects.count(),
     }
+    # Instant search: an AJAX request only needs the results fragment, which the
+    # front-end swaps into the page without a full reload.
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        return render(request, "catalog/_results.html", context)
     return render(request, "catalog/book_list.html", context)
+
+
+def ai_summary(request, slug):
+    """Return an AI-generated summary of a book's reviews as JSON (AJAX)."""
+    book = get_object_or_404(Book, slug=slug)
+    return JsonResponse({"summary": generate_ai_summary(book)})
+
+
+def stats(request):
+    """Insights dashboard: community statistics rendered as charts.
+
+    Every dataset is produced by a single aggregation query (no Python-side
+    counting loops), then handed to Chart.js in the template as JSON.
+    """
+    review_qs = Review.objects.all()
+
+    # 1. Rating distribution (how many 1★…5★ reviews).
+    rating_counts = {
+        row["rating"]: row["c"]
+        for row in review_qs.values("rating").annotate(c=Count("id"))
+    }
+    ratings = {
+        "labels": ["1★", "2★", "3★", "4★", "5★"],
+        "data": [rating_counts.get(i, 0) for i in range(1, 6)],
+    }
+
+    # 2. Books per genre (doughnut).
+    by_genre = Genre.objects.annotate(n=Count("books")).order_by("-n")
+    genre_books = {"labels": [g.name for g in by_genre], "data": [g.n for g in by_genre]}
+
+    # 3. Average rating per genre (only genres that have any reviews).
+    avg_genre = (
+        Genre.objects.annotate(avg=Avg("books__reviews__rating"))
+        .filter(avg__isnull=False)
+        .order_by("-avg")
+    )
+    genre_avg = {
+        "labels": [g.name for g in avg_genre],
+        "data": [round(g.avg, 2) for g in avg_genre],
+    }
+
+    # 4. Reviews over time, grouped by month.
+    timeline_rows = (
+        review_qs.annotate(month=TruncMonth("created_at"))
+        .values("month")
+        .annotate(c=Count("id"))
+        .order_by("month")
+    )
+    timeline = {
+        "labels": [r["month"].strftime("%b %Y") for r in timeline_rows],
+        "data": [r["c"] for r in timeline_rows],
+    }
+
+    # 5. Top-rated books (need at least one review).
+    top_books = (
+        Book.objects.annotate(avg=Avg("reviews__rating"), n=Count("reviews"))
+        .filter(n__gt=0)
+        .order_by("-avg", "-n")[:5]
+    )
+    top = {
+        "labels": [b.title for b in top_books],
+        "data": [round(b.avg, 2) for b in top_books],
+    }
+
+    context = {
+        "charts": {
+            "ratings": ratings,
+            "genre_books": genre_books,
+            "genre_avg": genre_avg,
+            "timeline": timeline,
+            "top": top,
+        },
+        "totals": {
+            "books": Book.objects.count(),
+            "reviews": review_qs.count(),
+            "genres": Genre.objects.count(),
+            "avg_rating": round(review_qs.aggregate(a=Avg("rating"))["a"] or 0, 2),
+        },
+        "top_books": top_books,
+    }
+    return render(request, "catalog/stats.html", context)
 
 
 def book_detail(request, slug):

@@ -14,6 +14,7 @@ db.sqlite3-journal
 
 # Tooling / editors
 .shots/
+.preview/
 .DS_Store
 .idea/
 .vscode/

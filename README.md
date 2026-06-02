@@ -13,10 +13,11 @@ search, filtering, pagination, authentication and a responsive UI.
 
 | Area | What it does |
 |------|--------------|
-| **Books (CRUD)** | Create, read, update and delete books. Auto-generated unique slugs, optional cover image, genre, publication year. |
+| **Books (CRUD)** | Create, read, update and delete books. Auto-generated unique slugs, genre, publication year, and cover art (uploaded file *or* a live cover from the Open Library Covers API, with a graceful emoji fallback). |
 | **Reviews (CRUD)** | One rating (1–5★) + write-up per member per book; create/update/delete with ownership checks. |
 | **Genres** | Books are categorised; browse and filter by genre with live counts. |
 | **Reading list** | Shelve/unshelve any book (many-to-many) — updated instantly via **AJAX**, with a no-JS fallback. |
+| **Insights dashboard** | A `/insights/` page with five live **Chart.js** charts (ratings distribution, books & average rating per genre, reviews over time, top-rated books) — every dataset built from a single ORM aggregation query. |
 | **Authentication** | Sign up, log in, log out using Django's auth system; a `Profile` is auto-created per user. |
 | **Authorization** | Only a book's contributor (or staff) can edit/delete it; members can only edit their own reviews. Enforced in views *and* the API. |
 | **Search & filter** | Search by title/author/description, filter by genre, and sort by title / newest / rating / popularity. |
@@ -36,7 +37,7 @@ integration — **7 in total**).
 
 - **Backend:** Django 6.0, Django REST Framework 3.17
 - **Database:** SQLite (dev) / PostgreSQL (prod, via `DATABASE_URL`)
-- **Frontend:** Server-rendered Django templates + vanilla JS (no build step)
+- **Frontend:** Server-rendered Django templates + vanilla JS (no build step), a custom responsive stylesheet, the *Fraunces*/*Inter* type pairing, real cover artwork, and accessible fractional star ratings (custom template tag)
 - **Static files:** WhiteNoise (compressed, hashed in production)
 - **Server:** Gunicorn
 - **Deployment:** Render.com blueprint included

@@ -9,43 +9,63 @@ Creates genres, books, a handful of users and a spread of reviews so the UI,
 search, filtering, pagination and ratings can be explored immediately.
 """
 
+from datetime import timedelta
+
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 from django.db import transaction
+from django.utils import timezone
 
 from catalog.models import Book, Genre, Review
 
 GENRES = ["Science Fiction", "Fantasy", "Mystery", "Non-Fiction", "Romance", "History"]
 
+# Cover artwork is pulled live from the Open Library Covers API by ISBN:
+#   https://covers.openlibrary.org/b/isbn/<isbn>-L.jpg
+# (title, author, genre, year, description, isbn)
 BOOKS = [
     ("Dune", "Frank Herbert", "Science Fiction", 1965,
-     "A desert planet, a precious spice, and a young heir caught in a galactic power struggle."),
+     "A desert planet, a precious spice, and a young heir caught in a galactic power struggle.",
+     "9780441013593"),
     ("Neuromancer", "William Gibson", "Science Fiction", 1984,
-     "A washed-up hacker is hired for one last job in cyberspace."),
+     "A washed-up hacker is hired for one last job in cyberspace.",
+     "9780441569595"),
     ("The Hobbit", "J.R.R. Tolkien", "Fantasy", 1937,
-     "Bilbo Baggins is swept into a quest to reclaim a treasure guarded by a dragon."),
+     "Bilbo Baggins is swept into a quest to reclaim a treasure guarded by a dragon.",
+     "9780547928227"),
     ("The Name of the Wind", "Patrick Rothfuss", "Fantasy", 2007,
-     "The story of Kvothe, a legendary figure recounting his rise from gifted child to notorious wizard."),
+     "The story of Kvothe, a legendary figure recounting his rise from gifted child to notorious wizard.",
+     "9780756404741"),
     ("Gone Girl", "Gillian Flynn", "Mystery", 2012,
-     "On their fifth anniversary, Amy disappears and Nick becomes the prime suspect."),
+     "On their fifth anniversary, Amy disappears and Nick becomes the prime suspect.",
+     "9780307588371"),
     ("The Girl with the Dragon Tattoo", "Stieg Larsson", "Mystery", 2005,
-     "A journalist and a brilliant hacker investigate a decades-old disappearance."),
+     "A journalist and a brilliant hacker investigate a decades-old disappearance.",
+     "9780307454546"),
     ("Sapiens", "Yuval Noah Harari", "Non-Fiction", 2011,
-     "A sweeping look at how Homo sapiens came to dominate the planet."),
+     "A sweeping look at how Homo sapiens came to dominate the planet.",
+     "9780062316097"),
     ("Educated", "Tara Westover", "Non-Fiction", 2018,
-     "A memoir of growing up off-grid and the transformative power of education."),
+     "A memoir of growing up off-grid and the transformative power of education.",
+     "9780399590504"),
     ("Pride and Prejudice", "Jane Austen", "Romance", 1813,
-     "Elizabeth Bennet navigates manners, morality and marriage in Georgian England."),
+     "Elizabeth Bennet navigates manners, morality and marriage in Georgian England.",
+     "9780141439518"),
     ("The Notebook", "Nicholas Sparks", "Romance", 1996,
-     "An enduring love story told across decades."),
+     "An enduring love story told across decades.",
+     "9780553816716"),
     ("Guns, Germs, and Steel", "Jared Diamond", "History", 1997,
-     "Why some societies advanced while others did not — geography as destiny."),
+     "Why some societies advanced while others did not — geography as destiny.",
+     "9780393317558"),
     ("A People's History of the United States", "Howard Zinn", "History", 1980,
-     "American history told from the perspective of ordinary people."),
+     "American history told from the perspective of ordinary people.",
+     "9780062397348"),
     ("Project Hail Mary", "Andy Weir", "Science Fiction", 2021,
-     "A lone astronaut wakes with no memory and the fate of humanity on his shoulders."),
+     "A lone astronaut wakes with no memory and the fate of humanity on his shoulders.",
+     "9780593135204"),
     ("Mistborn", "Brandon Sanderson", "Fantasy", 2006,
-     "In a world of ash and oppression, a street thief discovers she can wield metals as magic."),
+     "In a world of ash and oppression, a street thief discovers she can wield metals as magic.",
+     "9780765311788"),
 ]
 
 REVIEWS = [
@@ -89,7 +109,8 @@ class Command(BaseCommand):
             users.append(user)
 
         created_books = 0
-        for i, (title, author, genre_name, year, desc) in enumerate(BOOKS):
+        for i, (title, author, genre_name, year, desc, isbn) in enumerate(BOOKS):
+            cover_url = f"https://covers.openlibrary.org/b/isbn/{isbn}-L.jpg"
             book, created = Book.objects.get_or_create(
                 title=title,
                 author=author,
@@ -97,9 +118,14 @@ class Command(BaseCommand):
                     "genre": genres[genre_name],
                     "published_year": year,
                     "description": desc,
+                    "cover_url": cover_url,
                     "added_by": users[i % len(users)],
                 },
             )
+            if not created and not book.cover_url:
+                # Backfill artwork for books seeded before covers were added.
+                book.cover_url = cover_url
+                book.save(update_fields=["cover_url"])
             if created:
                 created_books += 1
             # Attach a couple of reviews from different users per book.
@@ -111,6 +137,15 @@ class Command(BaseCommand):
                     author=reviewer,
                     defaults={"rating": rating, "headline": headline, "body": body},
                 )
+
+        # Spread review dates across the last ~6 months so the Insights timeline
+        # chart shows a realistic trend. (`update` bypasses auto_now_add.)
+        now = timezone.now()
+        for idx, review in enumerate(Review.objects.order_by("id")):
+            days_ago = (idx * 6) % 175
+            Review.objects.filter(pk=review.pk).update(
+                created_at=now - timedelta(days=days_ago)
+            )
 
         self.stdout.write(
             self.style.SUCCESS(

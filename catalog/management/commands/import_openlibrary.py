@@ -49,6 +49,7 @@ class Command(BaseCommand):
                 defaults={
                     "published_year": data["published_year"],
                     "description": data["description"],
+                    "cover_url": data.get("cover_url", ""),
                 },
             )
             status = "imported" if was_created else "already present"

@@ -80,6 +80,16 @@ class ViewTests(TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertContains(resp, "Tolkien")
 
+    def test_stats_dashboard_loads(self):
+        Review.objects.create(
+            book=self.book, author=self.other, rating=4, headline="h", body="b"
+        )
+        resp = self.client.get(reverse("catalog:stats"))
+        self.assertEqual(resp.status_code, 200)
+        # Aggregated chart payload is present and reflects the data.
+        self.assertEqual(resp.context["totals"]["reviews"], 1)
+        self.assertEqual(resp.context["charts"]["ratings"]["data"][3], 1)  # one 4★
+
     def test_create_requires_login(self):
         resp = self.client.get(reverse("catalog:book_create"))
         self.assertEqual(resp.status_code, 302)
@@ -126,6 +136,34 @@ class ViewTests(TestCase):
         resp = self.client.post(url, {"rating": 99, "headline": "", "body": ""})
         self.assertEqual(resp.status_code, 302)  # redirects with error message
         self.assertEqual(self.book.reviews.count(), 0)
+
+    def test_instant_search_returns_partial(self):
+        # An AJAX request gets only the results fragment, not the full page.
+        resp = self.client.get(
+            reverse("catalog:book_list"),
+            {"q": "hobbit"},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, "catalog/_results.html")
+        self.assertContains(resp, "The Hobbit")
+        self.assertNotContains(resp, "<html")  # no full page chrome
+
+    def test_ai_summary_endpoint(self):
+        Review.objects.create(
+            book=self.book, author=self.other, rating=5,
+            headline="Magical worldbuilding", body="The worldbuilding is magical and immersive.",
+        )
+        resp = self.client.get(reverse("catalog:ai_summary", args=[self.book.slug]))
+        self.assertEqual(resp.status_code, 200)
+        summary = resp.json()["summary"]
+        self.assertIn("5.0", summary)
+        self.assertIn("positive", summary)
+
+    def test_ai_summary_handles_no_reviews(self):
+        resp = self.client.get(reverse("catalog:ai_summary", args=[self.book.slug]))
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn("aren't any reviews", resp.json()["summary"])
 
     def test_ajax_toggle_shelf(self):
         self.client.login(username="other", password="pw12345!")

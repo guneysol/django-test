@@ -1,0 +1,41 @@
+{% load catalog_extras %}
+{% comment %}
+The search-results fragment: result count, the book grid and pagination.
+Rendered both inside book_list.html (full page) and on its own for the
+instant-search AJAX response, so the two can never drift apart.
+{% endcomment %}
+<p class="result-count">
+  {{ page_obj.paginator.count }} book{{ page_obj.paginator.count|pluralize }}
+  {% if query %}matching “{{ query }}”{% endif %}
+  {% if active_genre %}in {{ active_genre.name }}{% endif %}
+</p>
+
+{% if page_obj %}
+  <div class="book-grid">
+    {% for book in page_obj %}
+      <article class="card">
+        <a class="cover" href="{{ book.get_absolute_url }}" aria-label="{{ book.title }}">
+          <span class="cover-emoji">📖</span>
+          {% if book.cover_image_url %}<img src="{{ book.cover_image_url }}" alt="Cover of {{ book.title }}" loading="lazy" onerror="this.remove()">{% endif %}
+        </a>
+        <div class="card-body">
+          <h3><a href="{{ book.get_absolute_url }}">{{ book.title }}</a></h3>
+          <span class="card-meta">by {{ book.author }}{% if book.genre %} · {{ book.genre.name }}{% endif %}</span>
+          <div class="card-rating">
+            {% if book.avg_rating %}
+              {{ book.avg_rating|stars }}
+              <span class="count">{{ book.avg_rating|floatformat:1 }} ({{ book.num_reviews }})</span>
+            {% else %}
+              <span class="stars stars--empty" aria-hidden="true">★★★★★</span>
+              <span class="count">No reviews yet</span>
+            {% endif %}
+          </div>
+        </div>
+      </article>
+    {% endfor %}
+  </div>
+
+  {% include "catalog/_pagination.html" %}
+{% else %}
+  <p class="empty">No books match your search. Try a different term{% if user.is_authenticated %} or <a href="{% url 'catalog:book_create' %}">add a book</a>{% endif %}.</p>
+{% endif %}

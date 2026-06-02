@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Insights · BookNest{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <h1>Community insights</h1>
+  <p>A live look at what the BookNest community is reading and rating — every chart is built from the database in real time.</p>
+</section>
+
+<div class="stat-cards">
+  <div class="stat-card"><b>{{ totals.books }}</b><span>Books</span></div>
+  <div class="stat-card"><b>{{ totals.reviews }}</b><span>Reviews</span></div>
+  <div class="stat-card"><b>{{ totals.genres }}</b><span>Genres</span></div>
+  <div class="stat-card"><b>{{ totals.avg_rating }}</b><span>Avg rating ★</span></div>
+</div>
+
+<div class="chart-grid">
+  <div class="chart-card span-2">
+    <h3>📈 Reviews over time</h3>
+    <div class="chart-holder"><canvas id="timelineChart"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <h3>⭐ Rating distribution</h3>
+    <div class="chart-holder"><canvas id="ratingsChart"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <h3>📚 Books by genre</h3>
+    <div class="chart-holder"><canvas id="genreBooksChart"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <h3>🏆 Average rating by genre</h3>
+    <div class="chart-holder"><canvas id="genreAvgChart"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <h3>🔥 Top-rated books</h3>
+    <div class="chart-holder"><canvas id="topChart"></canvas></div>
+  </div>
+</div>
+
+{# Hand the aggregated data to JavaScript safely (auto-escaped JSON). #}
+{{ charts|json_script:"chart-data" }}
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+  const data = JSON.parse(document.getElementById("chart-data").textContent);
+
+  // Shared palette pulled from the site's design tokens.
+  const BROWN = "#8a4b2f", GOLD = "#d8a33a", INK = "#2a2722", MUTED = "#79736a";
+  const PALETTE = ["#8a4b2f", "#d8a33a", "#5e8c61", "#4a6fa5", "#a3568a", "#c77b3b"];
+  Chart.defaults.font.family = "'Inter', system-ui, sans-serif";
+  Chart.defaults.color = MUTED;
+
+  const noLegend = { plugins: { legend: { display: false } } };
+  const base = { responsive: true, maintainAspectRatio: false };
+
+  // 1. Reviews over time — line
+  new Chart(document.getElementById("timelineChart"), {
+    type: "line",
+    data: {
+      labels: data.timeline.labels,
+      datasets: [{
+        label: "Reviews", data: data.timeline.data,
+        borderColor: BROWN, backgroundColor: "rgba(138,75,47,.12)",
+        fill: true, tension: .35, pointBackgroundColor: BROWN, pointRadius: 4,
+      }],
+    },
+    options: { ...base, ...noLegend, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } },
+  });
+
+  // 2. Rating distribution — bar
+  new Chart(document.getElementById("ratingsChart"), {
+    type: "bar",
+    data: {
+      labels: data.ratings.labels,
+      datasets: [{ label: "Reviews", data: data.ratings.data, backgroundColor: GOLD, borderRadius: 6 }],
+    },
+    options: { ...base, ...noLegend, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } },
+  });
+
+  // 3. Books by genre — doughnut
+  new Chart(document.getElementById("genreBooksChart"), {
+    type: "doughnut",
+    data: {
+      labels: data.genre_books.labels,
+      datasets: [{ data: data.genre_books.data, backgroundColor: PALETTE, borderWidth: 2, borderColor: "#fff" }],
+    },
+    options: { ...base, plugins: { legend: { position: "bottom" } } },
+  });
+
+  // 4. Average rating by genre — horizontal bar
+  new Chart(document.getElementById("genreAvgChart"), {
+    type: "bar",
+    data: {
+      labels: data.genre_avg.labels,
+      datasets: [{ label: "Avg rating", data: data.genre_avg.data, backgroundColor: BROWN, borderRadius: 6 }],
+    },
+    options: { ...base, ...noLegend, indexAxis: "y", scales: { x: { beginAtZero: true, max: 5 } } },
+  });
+
+  // 5. Top-rated books — horizontal bar
+  new Chart(document.getElementById("topChart"), {
+    type: "bar",
+    data: {
+      labels: data.top.labels,
+      datasets: [{ label: "Avg rating", data: data.top.data, backgroundColor: GOLD, borderRadius: 6 }],
+    },
+    options: { ...base, ...noLegend, indexAxis: "y", scales: { x: { beginAtZero: true, max: 5 } } },
+  });
+})();
+</script>
+{% endblock %}

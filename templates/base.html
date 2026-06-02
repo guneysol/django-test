@@ -5,6 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}BookNest{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
@@ -14,6 +17,7 @@
       <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">☰</button>
       <nav class="nav-links">
         <a href="{% url 'catalog:book_list' %}">Browse</a>
+        <a href="{% url 'catalog:stats' %}">Insights</a>
         {% if user.is_authenticated %}
           <a href="{% url 'catalog:book_create' %}">Add book</a>
           <a href="{% url 'accounts:profile_detail' user.username %}">My profile</a>

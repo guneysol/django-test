@@ -53,6 +53,10 @@ class Book(models.Model):
     )
     description = models.TextField(blank=True)
     cover = models.ImageField(upload_to="covers/", blank=True, null=True)
+    # An external cover image (e.g. from the Open Library Covers API). Used as a
+    # fallback when no file has been uploaded, so seeded/imported books still
+    # show real artwork.
+    cover_url = models.URLField(blank=True)
     published_year = models.PositiveIntegerField(
         null=True,
         blank=True,
@@ -98,6 +102,13 @@ class Book(models.Model):
 
     def get_absolute_url(self):
         return reverse("catalog:book_detail", args=[self.slug])
+
+    @property
+    def cover_image_url(self):
+        """Best available cover: an uploaded file, else an external URL."""
+        if self.cover:
+            return self.cover.url
+        return self.cover_url or ""
 
     @property
     def average_rating(self):
