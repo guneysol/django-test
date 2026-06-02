@@ -201,8 +201,26 @@ div.breadcrumbs {
     grid-template-columns: 1fr;
   }
 }
+/* Lay the app modules out as a filling card grid instead of a narrow column. */
 .bn-dash-grid #content-main {
   width: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 18px;
+  align-content: start;
+}
+.bn-dash-grid #content-main .module {
+  margin: 0;
+}
+/* Bigger, clearer action links inside the module cards. */
+.bn-dash-grid .module td a,
+.bn-dash-grid .module th a {
+  font-size: 0.92rem;
+}
+.bn-dash-grid .module .addlink,
+.bn-dash-grid .module .changelink,
+.bn-dash-grid .module .viewlink {
+  padding: 2px 0;
 }
 
 /* App-list modules: rounded cards with a branded header bar. */
