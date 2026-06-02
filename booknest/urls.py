@@ -15,6 +15,11 @@ router.register("books", BookViewSet, basename="book")
 router.register("reviews", ReviewViewSet, basename="review")
 router.register("genres", GenreViewSet, basename="genre")
 
+# --- Admin branding ----------------------------------------------------------
+admin.site.site_header = "📚 BookNest Admin"
+admin.site.site_title = "BookNest Admin"
+admin.site.index_title = "Catalogue management"
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     # Built-in auth views (login, logout, password management).

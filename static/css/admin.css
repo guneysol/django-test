@@ -1,0 +1,110 @@
+/* ---------------------------------------------------------------------------
+   BookNest admin theme.
+   Django's admin is built on CSS custom properties, so re-branding is just a
+   matter of overriding those variables (loaded after the default admin CSS).
+   We match the public site's warm "library" palette and type pairing.
+--------------------------------------------------------------------------- */
+
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap");
+
+:root {
+  --primary: #8a4b2f;
+  --secondary: #693620;
+  --accent: #d8a33a;
+  --primary-fg: #ffffff;
+
+  --header-color: #fdf8f0;
+  --header-bg: #693620;
+  --header-branding-color: #d8a33a;
+  --header-link-color: #fdf8f0;
+
+  --breadcrumbs-fg: #f3ead4;
+  --breadcrumbs-link-fg: #fff;
+  --breadcrumbs-bg: #8a4b2f;
+
+  --link-fg: #8a4b2f;
+  --link-hover-color: #54290f;
+  --link-selected-fg: #693620;
+
+  --button-bg: #8a4b2f;
+  --button-fg: #fff;
+  --button-hover-bg: #693620;
+  --default-button-bg: #693620;
+  --default-button-hover-bg: #54290f;
+  --close-button-bg: #8a7a63;
+  --close-button-hover-bg: #6b5d49;
+
+  --object-tools-bg: #693620;
+  --object-tools-fg: #fff;
+  --object-tools-hover-bg: #54290f;
+
+  --selected-row: #fbf0d2;
+  --selected-bg: #f7efe3;
+
+  --font-family-primary: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Keep the brand colours in dark mode too. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary: #c98a5e;
+    --secondary: #b5703f;
+    --accent: #e6b54e;
+    --header-bg: #2a1c12;
+    --header-branding-color: #e6b54e;
+    --link-fg: #d99a6c;
+    --link-hover-color: #e6b54e;
+    --button-bg: #b5703f;
+    --button-hover-bg: #c98a5e;
+  }
+}
+html[data-theme="dark"] {
+  --primary: #c98a5e;
+  --secondary: #b5703f;
+  --accent: #e6b54e;
+  --header-bg: #2a1c12;
+  --header-branding-color: #e6b54e;
+  --link-fg: #d99a6c;
+  --link-hover-color: #e6b54e;
+  --button-bg: #b5703f;
+  --button-hover-bg: #c98a5e;
+}
+
+/* Serif display type for the brand + section headers, matching the site. */
+#site-name a,
+#content h1,
+.module h2,
+.module caption,
+fieldset h2 {
+  font-family: "Fraunces", "Iowan Old Style", Georgia, serif !important;
+  letter-spacing: -0.01em;
+}
+
+#site-name {
+  font-weight: 700;
+}
+
+/* Slightly softer, more modern cards/modules. */
+.module {
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(60, 40, 20, 0.08);
+}
+
+#header {
+  box-shadow: 0 2px 10px rgba(60, 40, 20, 0.12);
+}
+
+/* Rounded, friendlier buttons to echo the public site. */
+.button,
+input[type="submit"],
+input[type="button"],
+.submit-row input,
+a.button {
+  border-radius: 8px;
+}
+
+div.breadcrumbs {
+  font-weight: 500;
+}
