@@ -221,6 +221,15 @@ class APITests(TestCase):
         resp = self.client.get("/api/books/", {"search": "dune"})
         self.assertEqual(resp.json()["count"], 1)
 
+    def test_openapi_schema_available(self):
+        resp = self.client.get("/api/schema/")
+        self.assertEqual(resp.status_code, 200)
+
+    def test_swagger_docs_available(self):
+        resp = self.client.get("/api/docs/")
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "swagger")
+
 
 class AdminTests(TestCase):
     def setUp(self):

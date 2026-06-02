@@ -24,8 +24,8 @@ class BookSerializer(serializers.ModelSerializer):
     genre = serializers.SlugRelatedField(
         slug_field="name", queryset=Genre.objects.all(), required=False, allow_null=True
     )
-    average_rating = serializers.ReadOnlyField()
-    review_count = serializers.ReadOnlyField()
+    average_rating = serializers.FloatField(read_only=True)
+    review_count = serializers.IntegerField(read_only=True)
     added_by = serializers.ReadOnlyField(source="added_by.username")
 
     class Meta:

@@ -5,6 +5,11 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularRedocView,
+    SpectacularSwaggerView,
+)
 from rest_framework.routers import DefaultRouter
 
 from catalog.api import BookViewSet, GenreViewSet, ReviewViewSet
@@ -29,6 +34,14 @@ urlpatterns = [
     # Browsable REST API under /api/ with session-auth login support.
     path("api/", include((router.urls, "api"))),
     path("api-auth/", include("rest_framework.urls")),
+    # Interactive API documentation.
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path(
+        "api/docs/",
+        SpectacularSwaggerView.as_view(url_name="schema"),
+        name="swagger-ui",
+    ),
+    path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
     # The catalog owns the site root.
     path("", include("catalog.urls")),
 ]

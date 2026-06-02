@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # Third-party
     "rest_framework",
+    "drf_spectacular",
     # Local
     "accounts",
     "catalog",
@@ -174,6 +175,29 @@ REST_FRAMEWORK = {
     "DEFAULT_FILTER_BACKENDS": [
         "rest_framework.filters.SearchFilter",
         "rest_framework.filters.OrderingFilter",
+    ],
+    # Auto-generate the OpenAPI schema for interactive docs (Swagger / ReDoc).
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+# --- API documentation (drf-spectacular) -------------------------------------
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "BookNest API",
+    "DESCRIPTION": (
+        "REST API for the BookNest community book-review platform.\n\n"
+        "Browse books, genres and reviews. Reads are public; writing requires "
+        "authentication, and you may only modify your own content. Adding books "
+        "is restricted to staff. Log in via the session at `/api-auth/login/` to "
+        "try authenticated requests below."
+    ),
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SWAGGER_UI_SETTINGS": {"persistAuthorization": True, "displayRequestDuration": True},
+    "TAGS": [
+        {"name": "books", "description": "Create, read, update and delete books."},
+        {"name": "reviews", "description": "Member reviews and ratings."},
+        {"name": "genres", "description": "Book categories (read-only)."},
     ],
 }
 
